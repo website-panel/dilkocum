@@ -2346,7 +2346,7 @@
                     } catch (error) {
                         console.error("Sınav başlatılamadı:", error);
                         // YÖNLENDİRME DÜZELTİLDİ
-                        showBilgiPopup(`Hata: ${error.message}`, () => { window.location.href = 'odevler.html'; });
+                        showBilgiPopup(`Hata: ${error.message}`, () => { window.location.href = 'program.html'; });
                     }
 
                 } else {
@@ -2354,7 +2354,7 @@
                     document.body.innerHTML = `<div style="text-align:center; padding:50px;">
                         <h1>Geçersiz Sınav</h1>
                         <p>Bu sınava bir ödev bağlantısı üzerinden erişmelisiniz.</p>
-                        <a href="odevler.html">Ödevlerime Dön</a>
+                        <a href="program.html">Ödevlerime Dön</a>
                     </div>`;
                 }
 
@@ -2371,11 +2371,11 @@
             ui.prevBtn.addEventListener('click', oncekiSoru);
             ui.nextBtn.addEventListener('click', sonrakiSoru);
             
-            ui.odevlereDonBtn.addEventListener('click', () => { window.location.href = 'odevler.html'; });
+            ui.odevlereDonBtn.addEventListener('click', () => { window.location.href = 'program.html'; });
             ui.devamEtBtn.addEventListener('click', () => { window.location.reload(); }); // Sayfayı yenile, yeni metni yüklesin
             document.getElementById('sorulari-incele-btn').addEventListener('click', sorulariIncelemeyeBasla);
             
-            document.getElementById('sonuclara-don-btn').addEventListener('click', () => { window.location.href = 'odevler.html'; });
+            document.getElementById('sonuclara-don-btn').addEventListener('click', () => { window.location.href = 'program.html'; });
             
             document.getElementById('prev-btn-inceleme').addEventListener('click', oncekiIncelemeSoru);
             document.getElementById('next-btn-inceleme').addEventListener('click', sonrakiIncelemeSoru);
@@ -2446,13 +2446,13 @@
             // Eski localStorage mantığı KALDIRILDI.
             const sinavTuru = kategori;
             if (!sinavTuru || !SINAV_VERITABANI[sinavTuru]) {
-                showBilgiPopup(`Sınav türü ('${sinavTuru}') geçersiz.`, () => { window.location.href = 'odevler.html'; });
+                showBilgiPopup(`Sınav türü ('${sinavTuru}') geçersiz.`, () => { window.location.href = 'program.html'; });
                 return;
             }
             
             const tumParagraflar = SINAV_VERITABANI[sinavTuru];
             if (tumParagraflar.length === 0) {
-                showBilgiPopup("Bu kategori için sisteme henüz metin eklenmemiş.", () => { window.location.href = 'odevler.html'; });
+                showBilgiPopup("Bu kategori için sisteme henüz metin eklenmemiş.", () => { window.location.href = 'program.html'; });
                 state.sorular = [];
                 return;
             }
@@ -2463,7 +2463,7 @@
             // 2. Eğer çözülmemiş metin kalmadıysa (havuz bittiyse)
             if (!secilenMetin) {
                  showBilgiPopup("Tebrikler! Bu kategorideki tüm metinleri tamamladınız. Lütfen öğretmeninize bildirin.", () => {
-                    window.location.href = 'odevler.html';
+                    window.location.href = 'program.html';
                 });
                 state.sorular = [];
                 return;
