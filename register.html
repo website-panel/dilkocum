@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kayıt Ol - Ödev Programım</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    /* =============================
+       TÜM SAYFALARDA ORTAK STİLLER
+       (index.html'deki ile aynı stil bloğu)
+       ============================= */
+    :root {
+      /* Kurumsal Palet */
+      --primary-color: #0d3d6e;
+      --primary-600: #144d87;
+      --primary-light: #1a5a96;
+      --primary-lighter: #e7f0f7;
+      --accent: #00e0ff;
+
+      --success-color: #28a745; --success-dark: #1e7e34; --success-lighter: #eaf6ec;
+      --danger-color: #d9534f; --danger-dark: #c9302c; --danger-lighter: #fdeded;
+      --warning-color: #f0ad4e; --warning-dark: #ec971f;
+      --secondary-color: #6c757d; --secondary-dark: #5a6268;
+      --info-color: #5bc0de; --info-dark: #31b0d5;
+
+      --background-color: #f4f7fa;
+      --background-gradient: radial-gradient(900px 600px at 120% -10%, #e9f4ff 0%, transparent 60%),
+                             radial-gradient(800px 500px at -10% 110%, #e9f4ff 0%, transparent 60%),
+                             #f4f7fa;
+      --card-background: #ffffff;
+
+      --text-color: #1f2a37;
+      --text-light: #556274;
+      --muted: #98a2b3;
+      --border-color: #e0e5ee;
+
+      --radius-lg: 16px;
+      --radius-md: 12px;
+      --shadow-sm: 0 4px 12px rgba(2, 21, 44, 0.06);
+      --shadow: 0 12px 30px rgba(2, 21, 44, 0.08);
+      --shadow-lg: 0 24px 60px rgba(2, 21, 44, 0.12);
+      --focus-ring: 0 0 0 3px rgba(26, 90, 150, 0.18);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; }
+    body {
+      font-family: 'Poppins', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      color: var(--text-color);
+      background: var(--background-gradient);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;
+    }
+    .bg-ornaments { position: fixed; inset: 0; pointer-events: none; z-index: -1; filter: blur(42px) saturate(120%); }
+    .blob { position: absolute; border-radius: 9999px; opacity: .25; transform: translate(-50%,-50%); animation: float 12s ease-in-out infinite; }
+    .blob.b1 { width: 520px; height: 520px; background: #9fe0ff; left: 8%; top: 15%; }
+    .blob.b2 { width: 580px; height: 580px; background: #68b6ff; left: 92%; top: 12%; animation-delay: -4s; }
+    .blob.b3 { width: 620px; height: 620px; background: #91c9ff; left: 50%; top: 102%; animation-delay: -8s; }
+    @keyframes float { 0%,100%{ transform:translate(-50%,-50%) translateY(0)} 50%{ transform:translate(-50%,-50%) translateY(-12px)} }
+
+    /* =============================
+       YENİ: GİRİŞ/KAYIT STİLLERİ
+       (index.html'deki ile aynı)
+       ============================= */
+    .auth-container {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 24px;
+    }
+    .auth-card {
+      background: var(--card-background);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-lg);
+      width: 100%;
+      max-width: 460px;
+      padding: 32px 36px;
+      animation: fadeIn .3s ease-out;
+    }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    
+    .auth-header {
+      text-align: center;
+      margin-bottom: 28px;
+    }
+    .auth-header h1 {
+      font-size: 1.8em;
+      font-weight: 700;
+      color: var(--primary-color);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 10px;
+    }
+    .auth-header h1::before {
+      content: "\1F4D3"; /* Ödev ikonu */
+      font-size: 1.1em;
+    }
+    .auth-header p {
+      font-size: 1.05em;
+      color: var(--text-light);
+      margin-top: 6px;
+    }
+    
+    .form-group {
+      margin-bottom: 20px;
+    }
+    .form-group label {
+      display: block;
+      font-weight: 600;
+      font-size: 0.9em;
+      margin-bottom: 8px;
+      color: var(--text-color);
+    }
+    .form-group input {
+      width: 100%;
+      padding: 12px 16px;
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      font-size: 1em;
+      font-family: 'Poppins', sans-serif;
+      transition: border-color .2s ease, box-shadow .2s ease;
+    }
+    .form-group input:focus {
+      outline: none;
+      border-color: var(--primary-light);
+      box-shadow: var(--focus-ring);
+    }
+    /* İkili form grubu için */
+    .form-row {
+      display: flex;
+      gap: 16px;
+    }
+    .form-row .form-group {
+      flex: 1;
+    }
+
+    .auth-button {
+      display: inline-block;
+      width: 100%;
+      background: linear-gradient(135deg, var(--primary-light), var(--primary-color));
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      padding: 12px 18px;
+      font-size: 1.05em;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 10px 20px rgba(13,61,110,.18);
+      transition: transform .2s ease, box-shadow .2s ease;
+      text-decoration: none;
+      text-align: center;
+    }
+    .auth-button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 14px 28px rgba(13,61,110,.25);
+    }
+    .auth-button:disabled {
+      background: var(--secondary-color);
+      cursor: not-allowed;
+      box-shadow: none;
+      transform: none;
+    }
+    
+    .auth-link {
+      text-align: center;
+      margin-top: 24px;
+      font-size: 0.9em;
+      color: var(--text-light);
+    }
+    .auth-link a {
+      color: var(--primary-600);
+      font-weight: 600;
+      text-decoration: none;
+    }
+    .auth-link a:hover {
+      text-decoration: underline;
+    }
+    
+    .error-box {
+      background: var(--danger-lighter);
+      color: var(--danger-dark);
+      border: 1px solid var(--danger-color);
+      padding: 12px 16px;
+      border-radius: 10px;
+      margin-bottom: 20px;
+      font-size: 0.9em;
+      text-align: center;
+      display: none; /* JS ile gösterilecek */
+    }
+  </style>
+</head>
+<body>
+  <div class="bg-ornaments" aria-hidden="true">
+    <div class="blob b1"></div>
+    <div class="blob b2"></div>
+    <div class="blob b3"></div>
+  </div>
+
+  <main class="auth-container">
+    <div class="auth-card">
+      <div class="auth-header">
+        <h1>Hesap Oluştur</h1>
+        <p>Ödev Programına Katılın</p>
+      </div>
+      
+      <form id="register-form">
+        <div id="error-message" class="error-box"></div>
+        
+        <div class="form-row">
+          <div class="form-group">
+            <label for="isim">İsim</label>
+            <input type="text" id="isim" name="isim" required>
+          </div>
+          <div class="form-group">
+            <label for="soyisim">Soyisim</label>
+            <input type="text" id="soyisim" name="soyisim" required>
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label for="email">E-posta Adresi</label>
+          <input type="email" id="email" name="email" required>
+        </div>
+        
+        <div class="form-group">
+          <label for="password">Şifre (En az 6 karakter)</label>
+          <input type="password" id="password" name="password" minlength="6" required>
+        </div>
+        
+        <button type="submit" id="register-button" class="auth-button">Kayıt Ol</button>
+      </form>
+      
+      <div class="auth-link">
+        Zaten bir hesabınız var mı? <a href="index.html">Giriş Yapın</a>
+      </div>
+    </div>
+  </main>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+    import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
+    import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+
+    // Kendi Firebase config bilgilerinizi buraya yapıştırın
+    // (program.html dosyasından kopyaladım)
+    const firebaseConfig = { apiKey: "AIzaSyAvaEaHtTwcuCDBIggJGd4w_nzJQM5UlmY", authDomain: "teacher-adminpanel.firebaseapp.com", projectId: "teacher-adminpanel", storageBucket: "teacher-adminpanel.appspot.com", messagingSenderId: "901735644134", appId: "1:901735644134:web:a6aa575a0754de1333f427", measurementId: "G-68BWZJYCK9" };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app); // Firestore'u da başlattık
+
+    const registerForm = document.getElementById('register-form');
+    const registerButton = document.getElementById('register-button');
+    const errorMessage = document.getElementById('error-message');
+
+    registerForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      
+      const isim = registerForm.isim.value;
+      const soyisim = registerForm.soyisim.value;
+      const email = registerForm.email.value;
+      const password = registerForm.password.value;
+
+      registerButton.disabled = true;
+      registerButton.textContent = 'Kayıt Yapılıyor...';
+      errorMessage.style.display = 'none';
+
+      createUserWithEmailAndPassword(auth, email, password)
+        .then(async (userCredential) => {
+          // Kullanıcı başarıyla Auth'a eklendi.
+          const user = userCredential.user;
+          
+          // Şimdi kullanıcı bilgilerini Firestore'a kaydedelim
+          // (program.html'deki kullaniciVerisiCek fonksiyonunun çalışması için bu gerekli)
+          try {
+            await setDoc(doc(db, "kullanicilar", user.uid), {
+              isim: isim,
+              soyisim: soyisim,
+              email: email
+            });
+            
+            // Her şey tamamsa, program.html'e yönlendir
+            window.location.href = 'program.html';
+
+          } catch (firestoreError) {
+            console.error("Firestore'a yazılırken hata:", firestoreError);
+            errorMessage.textContent = 'Hesap oluşturuldu ancak bilgiler kaydedilemedi. Lütfen tekrar giriş yapmayı deneyin.';
+            errorMessage.style.display = 'block';
+            registerButton.disabled = false;
+            registerButton.textContent = 'Kayıt Ol';
+          }
+        })
+        .catch((error) => {
+          // Hata yönetimi
+          let message = 'Kayıt yapılırken bir hata oluştu.';
+          if (error.code === 'auth/email-already-in-use') {
+            message = 'Bu e-posta adresi zaten kullanılıyor.';
+          } else if (error.code === 'auth/weak-password') {
+            message = 'Şifre çok zayıf. En az 6 karakter olmalı.';
+          } else {
+            console.error(error.message);
+          }
+          errorMessage.textContent = message;
+          errorMessage.style.display = 'block';
+          
+          registerButton.disabled = false;
+          registerButton.textContent = 'Kayıt Ol';
+        });
+    });
+  </script>
+</body>
+</html>

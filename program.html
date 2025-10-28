@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ödev Programım</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    /* =============================
+       DİLKOÇUM – Ödev Programım (UI revamp)
+       NOT: JS İŞLEYİŞİNE DOKUNMADAN yalnızca TASARIM yükseltildi.
+       ============================= */
+
+    :root {
+      /* Kurumsal Palet */
+      --primary-color: #0d3d6e;
+      --primary-600: #144d87;
+      --primary-light: #1a5a96;
+      --primary-lighter: #e7f0f7;
+      --accent: #00e0ff;
+
+      --success-color: #28a745; --success-dark: #1e7e34; --success-lighter: #eaf6ec;
+      --danger-color: #d9534f; --danger-dark: #c9302c; --danger-lighter: #fdeded;
+      --warning-color: #f0ad4e; --warning-dark: #ec971f;
+      --secondary-color: #6c757d; --secondary-dark: #5a6268;
+      --info-color: #5bc0de; --info-dark: #31b0d5;
+
+      --background-color: #f4f7fa;
+      --background-gradient: radial-gradient(900px 600px at 120% -10%, #e9f4ff 0%, transparent 60%),
+                             radial-gradient(800px 500px at -10% 110%, #e9f4ff 0%, transparent 60%),
+                             #f4f7fa;
+      --card-background: #ffffff;
+
+      --text-color: #1f2a37;
+      --text-light: #556274;
+      --muted: #98a2b3;
+      --border-color: #e0e5ee;
+
+      --radius-lg: 16px;
+      --radius-md: 12px;
+      --shadow-sm: 0 4px 12px rgba(2, 21, 44, 0.06);
+      --shadow: 0 12px 30px rgba(2, 21, 44, 0.08);
+      --shadow-lg: 0 24px 60px rgba(2, 21, 44, 0.12);
+      --focus-ring: 0 0 0 3px rgba(26, 90, 150, 0.18);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; }
+
+    body {
+      font-family: 'Poppins', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      color: var(--text-color);
+      background: var(--background-gradient);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;
+      padding-bottom: 30px;
+    }
+
+    /* Dekoratif blur baloncuklar */
+    .bg-ornaments { position: fixed; inset: 0; pointer-events: none; z-index: -1; filter: blur(42px) saturate(120%); }
+    .blob { position: absolute; border-radius: 9999px; opacity: .25; transform: translate(-50%,-50%); animation: float 12s ease-in-out infinite; }
+    .blob.b1 { width: 520px; height: 520px; background: #9fe0ff; left: 8%; top: 15%; }
+    .blob.b2 { width: 580px; height: 580px; background: #68b6ff; left: 92%; top: 12%; animation-delay: -4s; }
+    .blob.b3 { width: 620px; height: 620px; background: #91c9ff; left: 50%; top: 102%; animation-delay: -8s; }
+    @keyframes float { 0%,100%{ transform:translate(-50%,-50%) translateY(0)} 50%{ transform:translate(-50%,-50%) translateY(-12px)} }
+
+    /* Üst Bar */
+    .top-header {
+      background: linear-gradient(135deg, var(--primary-color), var(--primary-600));
+      color: white; padding: 18px 28px; box-shadow: var(--shadow-sm);
+      display: flex; justify-content: space-between; align-items: center;
+      position: sticky; top: 0; z-index: 10;
+    }
+    .top-header h1 { font-size: 1.5em; font-weight: 700; display: flex; align-items: center; gap: 10px; }
+    .top-header h1::before { content: "\1F4D3"; font-size: 1.1em; }
+
+    .user-info { font-size: 0.92em; text-align: right; }
+    .user-info strong { display: block; font-weight: 600; }
+    #logout-btn {
+      background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.28); color: #fff;
+      font-size: 0.9em; cursor: pointer; padding: 6px 12px; border-radius: 10px; margin-top: 6px;
+      transition: background .2s ease, transform .2s ease;
+    }
+    #logout-btn:hover { background: rgba(255,255,255,0.28); transform: translateY(-1px); }
+
+    /* Sayfa İçeriği */
+    .container { width: 100%; max-width: 1200px; margin: 26px auto; padding: 0 18px; }
+
+    .section { margin-bottom: 40px; }
+    .section h2 {
+      font-size: 1.6em; font-weight: 700; color: var(--primary-color);
+      display: flex; align-items: center; gap: 12px; margin-bottom: 14px;
+    }
+    .section h2::after { content: ""; flex: 1; height: 2px; background: linear-gradient(90deg, #dfe7f3, transparent); border-radius: 2px; }
+
+    .loading-container { text-align: center; padding: 60px; font-size: 1.08em; color: var(--text-light); }
+
+    .odev-listesi { display: flex; flex-direction: column; gap: 16px; }
+
+    /* Ödev Kartı */
+    .odev-karti {
+      position: relative;
+      background: var(--card-background);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 20px 46px 20px 22px; /* sağda çöp kutusu için alan */
+      display: flex; align-items: center; gap: 20px;
+      box-shadow: var(--shadow);
+      transition: transform .2s ease, box-shadow .2s ease;
+    }
+    #aktif-odevler-listesi .odev-karti:hover { transform: translateY(-3px); box-shadow: var(--shadow-lg); }
+
+    .odev-ikon { flex-shrink: 0; width: 54px; height: 54px; border-radius: 50%; display: grid; place-items: center;
+      background: radial-gradient(circle at 30% 30%, var(--accent), #b7f1ff); color: #0b335c; box-shadow: inset 0 0 0 2px rgba(13,61,110,.06); }
+    .odev-ikon svg { width: 22px; height: 22px; }
+
+    .odev-detay { flex: 1; min-width: 0; }
+    .odev-detay h3 { font-size: 1.12em; font-weight: 700; color: var(--text-color); margin: 0 0 6px 0; line-height: 1.25; }
+    .info-row .kategori-label { display: inline-block; background: var(--primary-light); color: #fff; padding: 4px 10px; border-radius: 999px; font-size: .82em; font-weight: 600; box-shadow: 0 2px 6px rgba(26,90,150,.18); }
+
+    .odev-bilgi { flex-shrink: 0; display: flex; gap: 26px; width: 340px; }
+    .odev-bilgi .info-row { display: flex; flex-direction: column; gap: 2px; align-items: flex-start; }
+    .odev-bilgi .label { font-size: .78em; color: var(--muted); letter-spacing: .4px; text-transform: uppercase; }
+    .odev-bilgi .value { font-size: 1.06em; font-weight: 700; color: var(--text-color); }
+
+    .progress-bar-container { width: 100%; }
+    .progress-bar { width: 100%; height: 8px; background: #e9eef6; border-radius: 6px; overflow: hidden; margin-top: 6px; }
+    .progress-bar-inner { height: 100%; width: 0%; background: linear-gradient(90deg, var(--primary-light), var(--primary-color)); border-radius: 6px; transition: width .35s ease; }
+
+    .odev-aksiyon { margin-left: auto; padding-left: 10px; }
+    .basla-btn { display: inline-block; background: linear-gradient(135deg, var(--primary-light), var(--primary-color)); color: #fff; border: none; border-radius: 12px; padding: 10px 18px; font-weight: 700; cursor: pointer; box-shadow: 0 10px 20px rgba(13,61,110,.18); transition: transform .2s ease, box-shadow .2s ease, background .2s ease; text-decoration: none; }
+    .basla-btn:hover { transform: translateY(-2px); box-shadow: 0 14px 28px rgba(13,61,110,.25); }
+    .basla-btn[style*='not-allowed'] { background: #b7c1cc !important; box-shadow: none; }
+
+    /* Durum: Tamamlandı */
+    .odev-karti.tamamlandi { border-left: 5px solid var(--success-color); background: #fcfdfd; }
+    .odev-karti.tamamlandi .odev-ikon { background: radial-gradient(circle at 30% 30%, #bff4c8, #e7ffef); color: var(--success-dark); }
+    .odev-karti.tamamlandi .odev-detay h3 { color: var(--text-light); text-decoration: line-through; }
+    .odev-karti.tamamlandi .odev-bilgi .net-label { color: var(--success-dark); font-size: 1.18em; font-weight: 800; }
+    .odev-karti.tamamlandi .odev-aksiyon { display: none; }
+
+    /* Silme Butonu */
+    .delete-btn { position: absolute; top: 12px; right: 12px; background: #fff; border: 1px solid #f0d3d2; border-radius: 10px; color: var(--danger-color); opacity: .7; cursor: pointer; padding: 6px; line-height: 0; transition: opacity .2s, transform .2s, background .2s, color .2s; box-shadow: 0 4px 12px rgba(217,83,79,.12); }
+    .delete-btn svg { width: 18px; height: 18px; display: block; }
+    .delete-btn:hover { opacity: 1; transform: scale(1.06); background: #fff3f2; color: var(--danger-dark); }
+
+    /* Tamamlananları Gruplama (details/summary) */
+    #tamamlanan-odevler-listesi { display: flex; flex-direction: column; gap: 10px; }
+    details { background: var(--card-background); border-radius: var(--radius-lg); border: 1px solid var(--border-color); overflow: hidden; box-shadow: var(--shadow-sm); }
+    summary { display: flex; align-items: center; gap: 12px; padding: 16px 18px; font-size: 1.02em; font-weight: 700; color: var(--primary-600); cursor: pointer; list-style: none; }
+    summary::marker, summary::-webkit-details-marker { display: none; }
+    summary::before { content: '▶'; font-size: .8em; transition: transform .2s ease; color: var(--primary-600); }
+    details[open] > summary::before { transform: rotate(90deg); }
+    details[open] > summary { border-bottom: 1px solid var(--border-color); background: #fbfdff; }
+    .odev-listesi-grup { padding: 16px; display: flex; flex-direction: column; gap: 12px; background: #fff; }
+    .odev-listesi-grup .odev-karti { box-shadow: none; padding: 16px 42px 16px 18px; }
+    .odev-listesi-grup .odev-karti .delete-btn { opacity: .45; }
+    .odev-listesi-grup .odev-karti:hover .delete-btn { opacity: .85; }
+
+    /* Boş Durum */
+    .bos-liste { padding: 28px; text-align: center; background: var(--card-background); border-radius: var(--radius-lg); border: 2px dashed var(--border-color); color: var(--text-light); font-size: 1.02em; }
+
+    /* Modal (Onay) */
+    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.6); z-index: 1000; display: flex; justify-content: center; align-items: center; opacity: 0; visibility: hidden; transition: all .25s ease-in-out; }
+    .modal-overlay.show { opacity: 1; visibility: visible; }
+    .modal-content { background: #fff; width: min(92%, 480px); padding: 28px 30px; border-radius: var(--radius-lg); box-shadow: var(--shadow-lg); text-align: center; }
+    .modal-content h2 { margin-top: 0; color: var(--danger-dark); font-size: 1.3em; }
+    .modal-content p { font-size: 1.02em; margin: 12px 0 18px; color: var(--text-light); }
+    .modal-buttons { display: flex; gap: 12px; justify-content: center; }
+    .modal-buttons button { border: none; padding: 11px 20px; border-radius: 10px; font-weight: 700; cursor: pointer; transition: transform .15s ease, box-shadow .15s ease; }
+    .modal-buttons .cancel { background: #6c757d; color: #fff; }
+    .modal-buttons .confirm { background: var(--danger-color); color: #fff; }
+    .modal-buttons .cancel:hover { transform: translateY(-1px); box-shadow: 0 8px 18px rgba(108,117,125,.25); }
+    .modal-buttons .confirm:hover { transform: translateY(-1px); box-shadow: 0 8px 18px rgba(217,83,79,.25); }
+
+    /* Responsive */
+    @media (max-width: 950px) {
+      .odev-bilgi { width: auto; flex-grow: 1; justify-content: space-around; }
+      .odev-aksiyon { padding-left: 6px; }
+    }
+    @media (max-width: 800px) {
+      .odev-karti { flex-direction: column; align-items: stretch; padding: 18px; }
+      .delete-btn { top: 12px; right: 12px; }
+      .odev-ikon { width: 46px; height: 46px; margin-bottom: 8px; }
+      .odev-bilgi { width: 100%; justify-content: space-between; margin-top: 10px; gap: 10px; flex-wrap: wrap; }
+      .odev-aksiyon { margin-left: 0; width: 100%; margin-top: 14px; padding-left: 0; }
+      .basla-btn { width: 100%; text-align: center; }
+      .odev-listesi-grup { padding: 12px; }
+    }
+    @media (max-width: 768px) {
+      .top-header { flex-direction: column; gap: 8px; text-align: center; }
+      .user-info { text-align: center; }
+    }
+    @media (max-width: 500px) {
+      .odev-karti { padding: 14px; gap: 12px; }
+      .odev-detay h3 { font-size: 1em; }
+      .info-row .kategori-label { font-size: .78em; }
+      .odev-bilgi .label { font-size: .74em; }
+      .odev-bilgi .value { font-size: .98em; }
+      summary { font-size: .98em; padding: 12px 14px; }
+    }
+
+    /* Karanlık Mod desteği (tercihe göre) */
+    @media (prefers-color-scheme: dark) {
+      :root { --background-color: #0e1623; --background-gradient: #0e1623; --card-background: #111c2b; --text-color: #dbe5f5; --text-light: #a9b6cc; --border-color: #223148; }
+      .top-header { box-shadow: none; }
+      .odev-karti, details, .modal-content { box-shadow: none; }
+      .delete-btn { background: #1b283d; border-color: #2a3a57; }
+      .bos-liste { background: #0f1a2a; }
+    }
+  </style>
+</head>
+<body>
+  <div class="bg-ornaments" aria-hidden="true">
+    <div class="blob b1"></div>
+    <div class="blob b2"></div>
+    <div class="blob b3"></div>
+  </div>
+
+  <header class="top-header">
+    <h1>Ödev Programım</h1>
+    <div class="user-info">
+      <strong id="kullanici-adi">Yükleniyor...</strong>
+      <button id="logout-btn">Güvenli Çıkış</button>
+    </div>
+  </header>
+
+  <div class="container">
+    <section class="section">
+      <h2>Aktif Görevler</h2>
+      <div id="aktif-odevler-listesi" class="odev-listesi">
+        <div class="loading-container" id="aktif-loading">Aktif ödevleriniz yükleniyor...</div>
+      </div>
+      <div id="aktif-bos" class="bos-liste" style="display:none">Harika! Tamamlanmamış aktif bir ödeviniz bulunmuyor.</div>
+    </section>
+
+    <section class="section">
+      <h2>Tamamlanan Görevler</h2>
+      <div id="tamamlanan-odevler-listesi" class="odev-listesi">
+        <div class="loading-container" id="tamam-loading">Geçmiş ödevleriniz yükleniyor...</div>
+      </div>
+      <div id="tamam-bos" class="bos-liste" style="display:none">Henüz tamamladığınız bir ödev bulunmuyor.</div>
+    </section>
+  </div>
+
+  <div id="onay-popup" class="modal-overlay">
+    <div class="modal-content">
+      <h2>Emin misiniz?</h2>
+      <p id="onay-mesaji">Bu ödevi silmek istediğinize emin misiniz? Bu işlem geri alınamaz.</p>
+      <div class="modal-buttons">
+        <button id="onay-iptal-btn" class="cancel">İptal</button>
+        <button id="onay-devam-btn" class="confirm">Evet, Sil</button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
+    import { getFirestore, collection, doc, getDoc, onSnapshot, query, orderBy, deleteDoc } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+
+    const firebaseConfig = { apiKey: "AIzaSyAvaEaHtTwcuCDBIggJGd4w_nzJQM5UlmY", authDomain: "teacher-adminpanel.firebaseapp.com", projectId: "teacher-adminpanel", storageBucket: "teacher-adminpanel.appspot.com", messagingSenderId: "901735644134", appId: "1:901735644134:web:a6aa575a0754de1333f427", measurementId: "G-68BWZJYCK9" };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    let currentUser = null;
+    let unsubscribeOdevler = null;
+
+    const readingKategorileri = ['advanced_reading', 'paragraph_test', 'cloze_test'];
+    const dateFormatter = new Intl.DateTimeFormat('tr-TR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const logoutBtn = document.getElementById('logout-btn');
+      if (logoutBtn) {
+        logoutBtn.addEventListener('click', () => {
+          signOut(auth).then(() => { window.location.href = 'index.html'; }) // index.html'e yönlendir
+                       .catch((error) => console.error("Çıkış hatası:", error));
+        });
+      }
+
+      onAuthStateChanged(auth, async (user) => {
+        if (!user) { window.location.href = 'index.html'; } // index.html'e yönlendir
+        else {
+          if (!currentUser) {
+            try {
+              const userData = await kullaniciVerisiCek(user.uid);
+              currentUser = { ...user, ...userData };
+              kullaniciBilgileriniYukle();
+              odevleriDinle(user.uid);
+            } catch (error) {
+              console.error("Başlatma hatası:", error);
+              const container = document.querySelector('.container');
+              if (container) container.innerHTML = "<p style='text-align:center;color:red;'>Veriler yüklenirken bir hata oluştu.</p>";
+            }
+          }
+        }
+      });
+    });
+
+    async function kullaniciVerisiCek(uid) {
+      const userDocRef = doc(db, "kullanicilar", uid);
+      try {
+        const docSnap = await getDoc(userDocRef);
+        // register.html'de kaydettiğimiz isim/soyisim'i buradan çekiyoruz
+        return docSnap.exists() ? docSnap.data() : { isim: "Öğrenci", soyisim: "" };
+      } catch (error) {
+        console.error("Kullanıcı verisi çekilirken hata:", error);
+        return { isim: "Öğrenci", soyisim: "" };
+      }
+    }
+
+    function kullaniciBilgileriniYukle() {
+      if (!currentUser) return;
+      const { isim, soyisim, email } = currentUser;
+      const gorunecekIsim = (isim && soyisim) ? `${isim} ${soyisim}` : (email || "Kullanıcı");
+      const kullaniciAdiElement = document.getElementById('kullanici-adi');
+      if (kullaniciAdiElement) { kullaniciAdiElement.textContent = gorunecekIsim; }
+    }
+
+    function odevleriDinle(uid) {
+      if (unsubscribeOdevler) unsubscribeOdevler();
+      const odevlerRef = collection(db, "odevler", uid, "gorevler");
+      const q = query(odevlerRef, orderBy("atanmaTarihi", "desc"));
+
+      unsubscribeOdevler = onSnapshot(q, (snapshot) => {
+        const aktifOdevlerListesi = document.getElementById('aktif-odevler-listesi');
+        if (!aktifOdevlerListesi) return;
+        aktifOdevlerListesi.innerHTML = '';
+        let aktifSayac = 0;
+        let tamamlananGorevler = [];
+        const simdi = new Date();
+
+        snapshot.forEach(doc => {
+          const odev = doc.data();
+          const odevId = doc.id;
+          if (odev.durum === "tamamlandi") {
+            tamamlananGorevler.push({ odev, odevId });
+          } else if (odev.durum === "atanmis") {
+            aktifOdevlerListesi.innerHTML += odevKartiOlustur(odev, odevId);
+            aktifSayac++;
+          } else if (odev.durum === "zamanlanmis") {
+            if (odev.gorunurlukTarihi && odev.gorunurlukTarihi.toDate) {
+              const gorunurlukZamani = odev.gorunurlukTarihi.toDate();
+              if (gorunurlukZamani <= simdi) {
+                aktifOdevlerListesi.innerHTML += odevKartiOlustur(odev, odevId);
+                aktifSayac++;
+              } else {
+                console.log(`Ödev (${odevId}) henüz görünür değil. Zamanı: ${gorunurlukZamani}`);
+              }
+            } else {
+              console.warn(`Ödev (${odevId}) zamanlanmış ama geçerli görünürlük tarihi yok.`);
+            }
+          }
+        });
+
+        const aktifLoading = document.getElementById('aktif-loading');
+        if (aktifLoading) aktifLoading.style.display = 'none';
+        const aktifBos = document.getElementById('aktif-bos');
+        if (aktifBos) aktifBos.style.display = (aktifSayac === 0) ? 'block' : 'none';
+
+        renderTamamlananOdevler(tamamlananGorevler);
+        attachDeleteListeners();
+      }, (error) => { console.error("Ödevler dinlenirken hata oluştu: ", error); });
+    }
+
+    function renderTamamlananOdevler(gorevler) {
+      const container = document.getElementById('tamamlanan-odevler-listesi');
+      const loading = document.getElementById('tamam-loading');
+      const bos = document.getElementById('tamam-bos');
+
+      if (loading) loading.style.display = 'none';
+      if (gorevler.length === 0) {
+        container.innerHTML = '';
+        if (bos) bos.style.display = 'block';
+        return;
+      }
+      if (bos) bos.style.display = 'none';
+
+      gorevler.sort((a, b) => {
+        const tarihA = a.odev.tamamlanmaTarihi?.toDate() || 0;
+        const tarihB = b.odev.tamamlanmaTarihi?.toDate() || 0;
+        return tarihB - tarihA;
+      });
+
+      let html = '';
+      let mevcutTarihKey = null;
+
+      for (const { odev, odevId } of gorevler) {
+        const tarih = odev.tamamlanmaTarihi?.toDate() || odev.atanmaTarihi?.toDate();
+        const tarihKey = tarih ? dateFormatter.format(tarih) : 'Tarihsiz';
+
+        if (tarihKey !== mevcutTarihKey) {
+          if (mevcutTarihKey !== null) { html += `</div></details>`; }
+          html += `<details ${mevcutTarihKey === null ? 'open' : ''}><summary>${tarihKey}</summary><div class="odev-listesi-grup">`;
+          mevcutTarihKey = tarihKey;
+        }
+        html += odevKartiOlustur(odev, odevId);
+      }
+      if (gorevler.length > 0) { html += `</div></details>`; }
+      container.innerHTML = html;
+    }
+
+    function odevKartiOlustur(odev, odevId) {
+      const isTamamlandi = odev.durum === 'tamamlandi';
+      const isAtanmisGorunen = odev.durum === 'atanmis' || (odev.durum === 'zamanlanmis' && odev.gorunurlukTarihi?.toDate() <= new Date());
+
+      const atanmaTarihi = odev.atanmaTarihi?.toDate ? dateFormatter.format(odev.atanmaTarihi.toDate()) : 'Belirsiz';
+      const kategoriAdi = (odev.kategori || 'genel').replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+      const baslik = odev.baslik || 'Genel Görev';
+      const isReadingSinavi = ['advanced_reading','paragraph_test','cloze_test'].includes(odev.kategori);
+
+      const ikonAktif = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 16 16"><path d="M5 10.5a.5.5 0 0 1 .5-.5h2a.5.5 0 0 1 0 1h-2a.5.5 0 0 1-.5-.5m0-2a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5m0-2a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5m0-2a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5"/><path d="M3 0h10a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2v-1h1v1a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H3a1 1 0 0 0-1 1v1H1V2a2 2 0 0 1 2-2"/><path d="M1 5v-.5a.5.5 0 0 1 1 0V5h.5a.5.5 0 0 1 0 1h-2a.5.5 0 0 1 0-1zm0 3v-.5a.5.5 0 0 1 1 0V8h.5a.5.5 0 0 1 0 1h-2a.5.5 0 0 1 0-1zm0 3v-.5a.5.5 0 0 1 1 0v.5h.5a.5.5 0 0 1 0 1h-2a.5.5 0 0 1 0-1z"/></svg>`;
+      const ikonTamam = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 16 16"><path d="M12.736 4.264a.5.5 0 0 1 .708 0l1 1a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708 0l-3.5-3.5a.5.5 0 1 1 .708-.708L5 11.293l6.736-6.736a.5.5 0 0 1 .708 0z"/></svg>`;
+      const ikonSil = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M11 1.5v1h3.5a.5.5 0 0 1 0 1h-.538l-.853 10.66A2 2 0 0 1 11.115 16h-6.23a2 2 0 0 1-1.994-1.84L2.038 3.5H1.5a.5.5 0 0 1 0-1H5v-1A1.5 1.5 0 0 1 6.5 0h3A1.5 1.5 0 0 1 11 1.5m-5 0v1h4v-1a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5M4.5 5.029l.5 8.5a.5.5 0 1 0 .998-.06l-.5-8.5a.5.5 0 1 0-.998.06m6.53-.528a.5.5 0 0 0-.528.47l-.5 8.5a.5.5 0 0 0 .998.058l.5-8.5a.5.5 0 0 0-.47-.528M8 4.5a.5.5 0 0 0-.5.5v8.5a.5.5 0 0 0 1 0V5a.5.5 0 0 0-.5.5"/></svg>`;
+
+      let odevBilgiHtml = '';
+      let aksiyonHtml = '';
+      let kartSiniflari = 'odev-karti';
+      let ikonHtml = isTamamlandi ? ikonTamam : ikonAktif;
+
+      if (isTamamlandi) {
+        kartSiniflari += ' tamamlandi';
+        const sonuc = odev.sonuc || {};
+        let netSayisiNum = parseFloat(sonuc.netSayisi);
+        const netSayisiFormatted = !isNaN(netSayisiNum) && isFinite(netSayisiNum) ? netSayisiNum.toFixed(2) : 'N/A';
+        odevBilgiHtml = `
+          <div class="info-row">
+            <span class="label">Net</span>
+            <span class="value net-label">${netSayisiFormatted}</span>
+          </div>
+          <div class="info-row">
+            <span class="label">Skor</span>
+            <span class="value">${sonuc.dogruSayisi !== undefined ? sonuc.dogruSayisi : 0} D / ${sonuc.yanlisSayisi !== undefined ? sonuc.yanlisSayisi : 0} Y</span>
+          </div>`;
+        aksiyonHtml = '';
+      } else if (isAtanmisGorunen) {
+        let link = '#';
+        let baslaButonDisabled = true;
+        if (isReadingSinavi) {
+          const toplamSayi = odev.soruSayisi || 1;
+          const cozulenSayi = (odev.cozulenMetinler || []).length;
+          if (cozulenSayi >= toplamSayi) {
+            baslaButonDisabled = true;
+            console.warn(`Reading ödevi (${odevId}) atanmış görünüyor ama tüm metinler çözülmüş.`);
+          } else {
+            link = `sinav_reading.html?kategori=${odev.kategori}&odevId=${odevId}&soruSayisi=${toplamSayi}`;
+            baslaButonDisabled = false;
+          }
+          const yuzde = (toplamSayi > 0) ? (cozulenSayi / toplamSayi) * 100 : 0;
+          odevBilgiHtml = `
+            <div class="info-row progress-bar-container">
+              <span class="label">İlerleme: ${cozulenSayi} / ${toplamSayi} Metin</span>
+              <div class="progress-bar"><div class="progress-bar-inner" style="width:${yuzde}%"></div></div>
+            </div>
+            <div class="info-row"><span class="label">Atanma Tarihi</span><span class="value">${atanmaTarihi}</span></div>`;
+        } else if (odev.kategori && odev.soruSayisi > 0) {
+          link = `sinav.html?kategori=${odev.kategori}&soruSayisi=${odev.soruSayisi}&odevId=${odevId}`;
+          baslaButonDisabled = false;
+          odevBilgiHtml = `
+            <div class="info-row"><span class="label">Tip</span><span class="value">${odev.soruSayisi} Soru</span></div>
+            <div class="info-row"><span class="label">Atanma Tarihi</span><span class="value">${atanmaTarihi}</span></div>`;
+        } else {
+          baslaButonDisabled = true;
+          odevBilgiHtml = `
+            <div class="info-row"><span class="label">Tip</span><span class="value" style="color:red;">Hatalı</span></div>
+            <div class="info-row"><span class="label">Atanma Tarihi</span><span class="value">${atanmaTarihi}</span></div>`;
+        }
+        const baslaButonMetni = baslaButonDisabled ? 'Başlatılamıyor' : 'Başla →';
+        aksiyonHtml = `<a href="${link}" class="basla-btn" ${baslaButonDisabled ? 'style="background-color: grey; cursor: not-allowed;" onclick="return false;"' : ''}>${baslaButonMetni}</a>`;
+      } else {
+        console.warn(`Görünmemesi gereken ödev kartı oluşturulmaya çalışıldı: ${odevId}`);
+        return '';
+      }
+
+      return `
+        <div class="${kartSiniflari}">
+          <button class="delete-btn" data-odevid="${odevId}" title="Ödevi Sil">${ikonSil}</button>
+          <div class="odev-ikon">${ikonHtml}</div>
+          <div class="odev-detay">
+            <h3>${baslik}</h3>
+            <span class="value kategori-label">${kategoriAdi}</span>
+          </div>
+          <div class="odev-bilgi">${odevBilgiHtml}</div>
+          ${!isTamamlandi ? `<div class="odev-aksiyon">${aksiyonHtml}</div>` : ''}
+        </div>`;
+    }
+
+    function attachDeleteListeners() {
+      document.querySelectorAll('.delete-btn').forEach(button => {
+        const newButton = button.cloneNode(true);
+        button.parentNode.replaceChild(newButton, button);
+        newButton.addEventListener('click', (e) => {
+          const odevId = e.currentTarget.dataset.odevid;
+          if (odevId) {
+            showOnayPopup('Bu ödevi silmek istediğinize emin misiniz? Bu işlem geri alınamaz.', () => { odeviSil(odevId); });
+          }
+        });
+      });
+    }
+
+    async function odeviSil(odevId) {
+      if (!currentUser || !odevId) {
+        console.error("Silme işlemi için kullanıcı veya ödev ID eksik.");
+        alert("Ödev silinirken bir hata oluştu.");
+        return;
+      }
+      const odevRef = doc(db, "odevler", currentUser.uid, "gorevler", odevId);
+      try { await deleteDoc(odevRef); console.log(`Ödev (${odevId}) başarıyla silindi.`); }
+      catch (error) { console.error("Ödev silinirken Firestore hatası:", error); alert("Ödev silinirken bir hata oluştu. Lütfen tekrar deneyin."); }
+    }
+
+    function showOnayPopup(mesaj, callback) {
+      const popup = document.getElementById('onay-popup');
+      if (!popup) return;
+      popup.querySelector('#onay-mesaji').innerHTML = mesaj;
+      popup.classList.add('show');
+
+      const iptalBtn = popup.querySelector('#onay-iptal-btn');
+      const devamBtn = popup.querySelector('#onay-devam-btn');
+      const newDevamBtn = devamBtn.cloneNode(true); devamBtn.parentNode.replaceChild(newDevamBtn, devamBtn);
+      const newIptalBtn = iptalBtn.cloneNode(true); iptalBtn.parentNode.replaceChild(newIptalBtn, iptalBtn);
+
+      const devamListener = () => { popup.classList.remove('show'); callback(); };
+      const iptalListener = () => { popup.classList.remove('show'); };
+
+      newDevamBtn.addEventListener('click', devamListener, { once: true });
+      newIptalBtn.addEventListener('click', iptalListener, { once: true });
+    }
+  </script>
+</body>
+</html>
