@@ -10,7 +10,6 @@
   <style>
     /* =============================
        DİLKOÇUM – Ödev Programım (UI revamp)
-       NOT: JS İŞLEYİŞİNE DOKUNMADAN yalnızca TASARIM yükseltildi.
        ============================= */
 
     :root {
@@ -118,7 +117,16 @@
 
     .odev-detay { flex: 1; min-width: 0; }
     .odev-detay h3 { font-size: 1.12em; font-weight: 700; color: var(--text-color); margin: 0 0 6px 0; line-height: 1.25; }
-    .info-row .kategori-label { display: inline-block; background: var(--primary-light); color: #fff; padding: 4px 10px; border-radius: 999px; font-size: .82em; font-weight: 600; box-shadow: 0 2px 6px rgba(26,90,150,.18); }
+    .kategori-label { /* .info-row kaldırıldı */
+      display: inline-block;
+      background: var(--primary-light);
+      color: #fff;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: .82em;
+      font-weight: 600;
+      box-shadow: 0 2px 6px rgba(26,90,150,.18);
+    }
 
     .odev-bilgi { flex-shrink: 0; display: flex; gap: 26px; width: 340px; }
     .odev-bilgi .info-row { display: flex; flex-direction: column; gap: 2px; align-items: flex-start; }
@@ -196,13 +204,13 @@
     @media (max-width: 500px) {
       .odev-karti { padding: 14px; gap: 12px; }
       .odev-detay h3 { font-size: 1em; }
-      .info-row .kategori-label { font-size: .78em; }
+      .kategori-label { font-size: .78em; }
       .odev-bilgi .label { font-size: .74em; }
       .odev-bilgi .value { font-size: .98em; }
       summary { font-size: .98em; padding: 12px 14px; }
     }
 
-    /* Karanlık Mod desteği (tercihe göre) */
+    /* Karanlık Mod desteği */
     @media (prefers-color-scheme: dark) {
       :root { --background-color: #0e1623; --background-gradient: #0e1623; --card-background: #111c2b; --text-color: #dbe5f5; --text-light: #a9b6cc; --border-color: #223148; }
       .top-header { box-shadow: none; }
@@ -270,20 +278,66 @@
     let currentUser = null;
     let unsubscribeOdevler = null;
 
-    const readingKategorileri = ['advanced_reading', 'paragraph_test', 'cloze_test'];
+    const READING_KATEGORILERI = ['advanced_reading', 'paragraph_test', 'cloze_test'];
     const dateFormatter = new Intl.DateTimeFormat('tr-TR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+
+    // --- GÜNCELLENMİŞ FONKSİYON ---
+    function hesaplaReadingBaslangicIndeksleri(snapshot) {
+      const items = [];
+      snapshot.forEach(d => {
+        const o = d.data();
+        if (READING_KATEGORILERI.includes(o.kategori)) {
+          const atan = o.atanmaTarihi?.toDate ? o.atanmaTarihi.toDate() : new Date(0);
+          items.push({ id: d.id, odev: o, atanma: atan });
+        }
+      });
+      items.sort((a, b) => a.atanma - b.atanma); // Tarihe göre sırala
+
+      let kümülatifToplam = 0; // Bir sonraki ödevin nereden başlayacağını takip eder
+      const baslangicHaritasi = {}; // Her ödevin kendi başlangıç indeksini saklar
+
+      for (const item of items) {
+        // 1. Bu ödev için başlangıç indeksini kaydet (öncekilerin toplamı)
+        baslangicHaritasi[item.id] = kümülatifToplam;
+
+        // 2. Bu ödev için kaç metin istendi?
+        const buOdevIcinGereken = Number(item.odev.soruSayisi) || 0;
+
+        // 3. Bu ödevin veritabanındaki TÜM tarihçesi (öncekiler dahil)
+        const tumTarihceUzunlugu = item.odev.cozulenMetinler?.length || 0;
+
+        // 4. Sadece BU ödev içinde kaç metin çözüldüğünü hesapla
+        //    (Toplam tarihçe - Bu ödevin başlangıç indeksi)
+        const buOdevdeCozulen = Math.max(0, tumTarihceUzunlugu - baslangicHaritasi[item.id]);
+
+        // 5. Bir sonraki ödevin başlangıcı için kümülatif toplamı güncelle
+        if (item.odev.durum === 'tamamlandi') {
+            // Tamamlandıysa, bu ödev için istenen sayıyı ekle
+            // (Veya veritabanındaki sayı daha fazlaysa onu kullan, beklenmedik durumlar için)
+            kümülatifToplam += Math.max(buOdevIcinGereken, buOdevdeCozulen);
+        } else {
+            // Tamamlanmadıysa, sadece bu ödevde çözülen kadarını ekle
+            // Ancak bu ödev için istenen sayıyı geçmemeli
+             kümülatifToplam += Math.min(buOdevdeCozulen, buOdevIcinGereken);
+        }
+      }
+    //   console.log("Hesaplanan Başlangıç İndeksleri:", baslangicHaritasi); // Gerekirse kontrol için
+      return baslangicHaritasi;
+    }
+    // --- GÜNCELLENMİŞ FONKSİYON BİTTİ ---
+
 
     document.addEventListener('DOMContentLoaded', () => {
       const logoutBtn = document.getElementById('logout-btn');
       if (logoutBtn) {
         logoutBtn.addEventListener('click', () => {
-          signOut(auth).then(() => { window.location.href = 'index.html'; }) // index.html'e yönlendir
-                       .catch((error) => console.error("Çıkış hatası:", error));
+          signOut(auth).then(() => { window.location.href = 'index.html'; })
+                      .catch((error) => console.error("Çıkış hatası:", error));
         });
       }
 
       onAuthStateChanged(auth, async (user) => {
-        if (!user) { window.location.href = 'index.html'; } // index.html'e yönlendir
+        if (!user) { window.location.href = 'index.html'; }
         else {
           if (!currentUser) {
             try {
@@ -305,7 +359,6 @@
       const userDocRef = doc(db, "kullanicilar", uid);
       try {
         const docSnap = await getDoc(userDocRef);
-        // register.html'de kaydettiğimiz isim/soyisim'i buradan çekiyoruz
         return docSnap.exists() ? docSnap.data() : { isim: "Öğrenci", soyisim: "" };
       } catch (error) {
         console.error("Kullanıcı verisi çekilirken hata:", error);
@@ -324,212 +377,288 @@
     function odevleriDinle(uid) {
       if (unsubscribeOdevler) unsubscribeOdevler();
       const odevlerRef = collection(db, "odevler", uid, "gorevler");
-      const q = query(odevlerRef, orderBy("atanmaTarihi", "desc"));
+      const q = query(odevlerRef, orderBy("atanmaTarihi", "desc")); // Öğretmen panelindekiyle aynı sıralama önemli
 
       unsubscribeOdevler = onSnapshot(q, (snapshot) => {
+        // 1) GÜNCELLENMİŞ fonksiyonu kullanarak başlangıç indekslerini hesapla
+        const readingBaslangicHaritasi = hesaplaReadingBaslangicIndeksleri(snapshot);
+
+        // 2) Ödevleri render et
         const aktifOdevlerListesi = document.getElementById('aktif-odevler-listesi');
-        if (!aktifOdevlerListesi) return;
+        if (!aktifOdevlerListesi) return; // Element yoksa çık
         aktifOdevlerListesi.innerHTML = '';
         let aktifSayac = 0;
         let tamamlananGorevler = [];
         const simdi = new Date();
 
-        snapshot.forEach(doc => {
-          const odev = doc.data();
-          const odevId = doc.id;
+        // Snapshot'ı GÖRSEL sıralamaya göre (yeni->eski) işle, ama başlangıç indeksi doğru hesaplandı
+        snapshot.forEach(docSnap => {
+          const odev = docSnap.data();
+          const odevId = docSnap.id;
+          const startFrom = readingBaslangicHaritasi[odevId]; // Hesaplanan başlangıç indeksini al
+
+          // startFrom tanımsızsa (beklenmedik durum), 0 varsay
+          const safeStartFrom = (startFrom !== undefined && startFrom !== null) ? startFrom : 0;
+
           if (odev.durum === "tamamlandi") {
-            tamamlananGorevler.push({ odev, odevId });
+            tamamlananGorevler.push({ odev, odevId, startFrom: safeStartFrom });
           } else if (odev.durum === "atanmis") {
-            aktifOdevlerListesi.innerHTML += odevKartiOlustur(odev, odevId);
+            aktifOdevlerListesi.innerHTML += odevKartiOlustur(odev, odevId, safeStartFrom);
             aktifSayac++;
           } else if (odev.durum === "zamanlanmis") {
             if (odev.gorunurlukTarihi && odev.gorunurlukTarihi.toDate) {
               const gorunurlukZamani = odev.gorunurlukTarihi.toDate();
               if (gorunurlukZamani <= simdi) {
-                aktifOdevlerListesi.innerHTML += odevKartiOlustur(odev, odevId);
+                aktifOdevlerListesi.innerHTML += odevKartiOlustur(odev, odevId, safeStartFrom);
                 aktifSayac++;
-              } else {
-                console.log(`Ödev (${odevId}) henüz görünür değil. Zamanı: ${gorunurlukZamani}`);
               }
-            } else {
-              console.warn(`Ödev (${odevId}) zamanlanmış ama geçerli görünürlük tarihi yok.`);
+              // else { console.log(`Ödev (${odevId}) henüz görünür değil.`); }
             }
+            // else { console.warn(`Zamanlanmış ödev (${odevId}) geçersiz tarih.`); }
           }
         });
 
+        // Yükleniyor/Boş mesajlarını ayarla
         const aktifLoading = document.getElementById('aktif-loading');
         if (aktifLoading) aktifLoading.style.display = 'none';
         const aktifBos = document.getElementById('aktif-bos');
         if (aktifBos) aktifBos.style.display = (aktifSayac === 0) ? 'block' : 'none';
 
-        renderTamamlananOdevler(tamamlananGorevler);
-        attachDeleteListeners();
-      }, (error) => { console.error("Ödevler dinlenirken hata oluştu: ", error); });
-    }
+        renderTamamlananOdevler(tamamlananGorevler); // startFrom bilgisi artık objenin içinde
+        attachDeleteListeners(); // Silme butonlarını etkinleştir
 
-    function renderTamamlananOdevler(gorevler) {
-      const container = document.getElementById('tamamlanan-odevler-listesi');
-      const loading = document.getElementById('tamam-loading');
-      const bos = document.getElementById('tamam-bos');
-
-      if (loading) loading.style.display = 'none';
-      if (gorevler.length === 0) {
-        container.innerHTML = '';
-        if (bos) bos.style.display = 'block';
-        return;
-      }
-      if (bos) bos.style.display = 'none';
-
-      gorevler.sort((a, b) => {
-        const tarihA = a.odev.tamamlanmaTarihi?.toDate() || 0;
-        const tarihB = b.odev.tamamlanmaTarihi?.toDate() || 0;
-        return tarihB - tarihA;
+      }, (error) => {
+        console.error("Ödevler dinlenirken hata oluştu: ", error);
+        // Hata durumunda kullanıcıya bilgi verilebilir
+        const aktifOdevlerListesi = document.getElementById('aktif-odevler-listesi');
+        if (aktifOdevlerListesi) aktifOdevlerListesi.innerHTML = '<p style="color:red; text-align:center;">Ödevler yüklenirken bir sorun oluştu.</p>';
       });
-
-      let html = '';
-      let mevcutTarihKey = null;
-
-      for (const { odev, odevId } of gorevler) {
-        const tarih = odev.tamamlanmaTarihi?.toDate() || odev.atanmaTarihi?.toDate();
-        const tarihKey = tarih ? dateFormatter.format(tarih) : 'Tarihsiz';
-
-        if (tarihKey !== mevcutTarihKey) {
-          if (mevcutTarihKey !== null) { html += `</div></details>`; }
-          html += `<details ${mevcutTarihKey === null ? 'open' : ''}><summary>${tarihKey}</summary><div class="odev-listesi-grup">`;
-          mevcutTarihKey = tarihKey;
-        }
-        html += odevKartiOlustur(odev, odevId);
-      }
-      if (gorevler.length > 0) { html += `</div></details>`; }
-      container.innerHTML = html;
     }
 
-    function odevKartiOlustur(odev, odevId) {
-      const isTamamlandi = odev.durum === 'tamamlandi';
-      const isAtanmisGorunen = odev.durum === 'atanmis' || (odev.durum === 'zamanlanmis' && odev.gorunurlukTarihi?.toDate() <= new Date());
+    // renderTamamlananOdevler fonksiyonu startFrom'ı kullanacak şekilde güncellendi
+    function renderTamamlananOdevler(gorevler) {
+        const container = document.getElementById('tamamlanan-odevler-listesi');
+        const loading = document.getElementById('tamam-loading');
+        const bos = document.getElementById('tamam-bos');
 
-      const atanmaTarihi = odev.atanmaTarihi?.toDate ? dateFormatter.format(odev.atanmaTarihi.toDate()) : 'Belirsiz';
-      const kategoriAdi = (odev.kategori || 'genel').replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
-      const baslik = odev.baslik || 'Genel Görev';
-      const isReadingSinavi = ['advanced_reading','paragraph_test','cloze_test'].includes(odev.kategori);
+        if (!container) return; // Element yoksa çık
 
-      const ikonAktif = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 16 16"><path d="M5 10.5a.5.5 0 0 1 .5-.5h2a.5.5 0 0 1 0 1h-2a.5.5 0 0 1-.5-.5m0-2a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5m0-2a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5m0-2a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5"/><path d="M3 0h10a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2v-1h1v1a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H3a1 1 0 0 0-1 1v1H1V2a2 2 0 0 1 2-2"/><path d="M1 5v-.5a.5.5 0 0 1 1 0V5h.5a.5.5 0 0 1 0 1h-2a.5.5 0 0 1 0-1zm0 3v-.5a.5.5 0 0 1 1 0V8h.5a.5.5 0 0 1 0 1h-2a.5.5 0 0 1 0-1zm0 3v-.5a.5.5 0 0 1 1 0v.5h.5a.5.5 0 0 1 0 1h-2a.5.5 0 0 1 0-1z"/></svg>`;
-      const ikonTamam = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 16 16"><path d="M12.736 4.264a.5.5 0 0 1 .708 0l1 1a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708 0l-3.5-3.5a.5.5 0 1 1 .708-.708L5 11.293l6.736-6.736a.5.5 0 0 1 .708 0z"/></svg>`;
-      const ikonSil = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M11 1.5v1h3.5a.5.5 0 0 1 0 1h-.538l-.853 10.66A2 2 0 0 1 11.115 16h-6.23a2 2 0 0 1-1.994-1.84L2.038 3.5H1.5a.5.5 0 0 1 0-1H5v-1A1.5 1.5 0 0 1 6.5 0h3A1.5 1.5 0 0 1 11 1.5m-5 0v1h4v-1a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5M4.5 5.029l.5 8.5a.5.5 0 1 0 .998-.06l-.5-8.5a.5.5 0 1 0-.998.06m6.53-.528a.5.5 0 0 0-.528.47l-.5 8.5a.5.5 0 0 0 .998.058l.5-8.5a.5.5 0 0 0-.47-.528M8 4.5a.5.5 0 0 0-.5.5v8.5a.5.5 0 0 0 1 0V5a.5.5 0 0 0-.5.5"/></svg>`;
+        if (loading) loading.style.display = 'none';
 
-      let odevBilgiHtml = '';
-      let aksiyonHtml = '';
-      let kartSiniflari = 'odev-karti';
-      let ikonHtml = isTamamlandi ? ikonTamam : ikonAktif;
-
-      if (isTamamlandi) {
-        kartSiniflari += ' tamamlandi';
-        const sonuc = odev.sonuc || {};
-        let netSayisiNum = parseFloat(sonuc.netSayisi);
-        const netSayisiFormatted = !isNaN(netSayisiNum) && isFinite(netSayisiNum) ? netSayisiNum.toFixed(2) : 'N/A';
-        odevBilgiHtml = `
-          <div class="info-row">
-            <span class="label">Net</span>
-            <span class="value net-label">${netSayisiFormatted}</span>
-          </div>
-          <div class="info-row">
-            <span class="label">Skor</span>
-            <span class="value">${sonuc.dogruSayisi !== undefined ? sonuc.dogruSayisi : 0} D / ${sonuc.yanlisSayisi !== undefined ? sonuc.yanlisSayisi : 0} Y</span>
-          </div>`;
-        aksiyonHtml = '';
-      } else if (isAtanmisGorunen) {
-        let link = '#';
-        let baslaButonDisabled = true;
-        if (isReadingSinavi) {
-          const toplamSayi = odev.soruSayisi || 1;
-          const cozulenSayi = (odev.cozulenMetinler || []).length;
-          if (cozulenSayi >= toplamSayi) {
-            baslaButonDisabled = true;
-            console.warn(`Reading ödevi (${odevId}) atanmış görünüyor ama tüm metinler çözülmüş.`);
-          } else {
-            link = `sinav_reading.html?kategori=${odev.kategori}&odevId=${odevId}&soruSayisi=${toplamSayi}`;
-            baslaButonDisabled = false;
-          }
-          const yuzde = (toplamSayi > 0) ? (cozulenSayi / toplamSayi) * 100 : 0;
-          odevBilgiHtml = `
-            <div class="info-row progress-bar-container">
-              <span class="label">İlerleme: ${cozulenSayi} / ${toplamSayi} Metin</span>
-              <div class="progress-bar"><div class="progress-bar-inner" style="width:${yuzde}%"></div></div>
-            </div>
-            <div class="info-row"><span class="label">Atanma Tarihi</span><span class="value">${atanmaTarihi}</span></div>`;
-        } else if (odev.kategori && odev.soruSayisi > 0) {
-          link = `sinav.html?kategori=${odev.kategori}&soruSayisi=${odev.soruSayisi}&odevId=${odevId}`;
-          baslaButonDisabled = false;
-          odevBilgiHtml = `
-            <div class="info-row"><span class="label">Tip</span><span class="value">${odev.soruSayisi} Soru</span></div>
-            <div class="info-row"><span class="label">Atanma Tarihi</span><span class="value">${atanmaTarihi}</span></div>`;
-        } else {
-          baslaButonDisabled = true;
-          odevBilgiHtml = `
-            <div class="info-row"><span class="label">Tip</span><span class="value" style="color:red;">Hatalı</span></div>
-            <div class="info-row"><span class="label">Atanma Tarihi</span><span class="value">${atanmaTarihi}</span></div>`;
+        if (gorevler.length === 0) {
+            container.innerHTML = ''; // İçeriği temizle
+            if (bos) bos.style.display = 'block';
+            return;
         }
-        const baslaButonMetni = baslaButonDisabled ? 'Başlatılamıyor' : 'Başla →';
-        aksiyonHtml = `<a href="${link}" class="basla-btn" ${baslaButonDisabled ? 'style="background-color: grey; cursor: not-allowed;" onclick="return false;"' : ''}>${baslaButonMetni}</a>`;
-      } else {
-        console.warn(`Görünmemesi gereken ödev kartı oluşturulmaya çalışıldı: ${odevId}`);
-        return '';
-      }
+        if (bos) bos.style.display = 'none';
 
-      return `
-        <div class="${kartSiniflari}">
-          <button class="delete-btn" data-odevid="${odevId}" title="Ödevi Sil">${ikonSil}</button>
-          <div class="odev-ikon">${ikonHtml}</div>
-          <div class="odev-detay">
-            <h3>${baslik}</h3>
-            <span class="value kategori-label">${kategoriAdi}</span>
-          </div>
-          <div class="odev-bilgi">${odevBilgiHtml}</div>
-          ${!isTamamlandi ? `<div class="odev-aksiyon">${aksiyonHtml}</div>` : ''}
-        </div>`;
+        // Tamamlanma tarihine göre (yeni->eski) sırala
+        gorevler.sort((a, b) => {
+            const tarihA = a.odev.tamamlanmaTarihi?.toDate() || a.odev.atanmaTarihi?.toDate() || 0;
+            const tarihB = b.odev.tamamlanmaTarihi?.toDate() || b.odev.atanmaTarihi?.toDate() || 0;
+            return tarihB - tarihA;
+        });
+
+        let html = '';
+        let mevcutTarihKey = null;
+
+        for (const { odev, odevId, startFrom } of gorevler) { // startFrom'ı al
+            const tarih = odev.tamamlanmaTarihi?.toDate() || odev.atanmaTarihi?.toDate();
+            const tarihKey = tarih ? dateFormatter.format(tarih) : 'Tarihsiz';
+
+            if (tarihKey !== mevcutTarihKey) {
+                if (mevcutTarihKey !== null) { html += `</div></details>`; }
+                // İlk grubu veya tarihi değişen grubu varsayılan olarak açık yap
+                html += `<details ${mevcutTarihKey === null || tarihKey !== mevcutTarihKey ? 'open' : ''}><summary>${tarihKey}</summary><div class="odev-listesi-grup">`;
+                mevcutTarihKey = tarihKey;
+            }
+            // odevKartiOlustur'a startFrom değerini ilet
+            html += odevKartiOlustur(odev, odevId, startFrom);
+        }
+        if (gorevler.length > 0) { html += `</div></details>`; } // Son grubu kapatmayı unutma
+        container.innerHTML = html;
     }
+
+
+    // --- GÜNCELLENMİŞ FONKSİYON ---
+    // Bu fonksiyon artık doğru startFrom değeriyle çağrılmalı
+    function odevKartiOlustur(odev, odevId, startFrom = 0) {
+        const isTamamlandi = odev.durum === 'tamamlandi';
+        // Zamanlanmış ama zamanı gelmiş ödevleri de aktif gibi göster
+        const isAktifGorunen = !isTamamlandi && (!odev.gorunurlukTarihi || odev.gorunurlukTarihi.toDate() <= new Date());
+
+        const atanmaTarihi = odev.atanmaTarihi?.toDate ? dateFormatter.format(odev.atanmaTarihi.toDate()) : 'Belirsiz';
+        const kategoriAdi = (odev.kategori || 'genel').replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+        const baslik = odev.baslik || 'Genel Görev';
+        const isReadingSinavi = READING_KATEGORILERI.includes(odev.kategori);
+
+        // İkonlar (SVG kodları aynı kalabilir)
+         const ikonAktif = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 16 16"><path d="M5 10.5a.5.5 0 0 1 .5-.5h2a.5.5 0 0 1 0 1h-2a.5.5 0 0 1-.5-.5m0-2a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5m0-2a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5m0-2a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5"/><path d="M3 0h10a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2v-1h1v1a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H3a1 1 0 0 0-1 1v1H1V2a2 2 0 0 1 2-2"/><path d="M1 5v-.5a.5.5 0 0 1 1 0V5h.5a.5.5 0 0 1 0 1h-2a.5.5 0 0 1 0-1zm0 3v-.5a.5.5 0 0 1 1 0V8h.5a.5.5 0 0 1 0 1h-2a.5.5 0 0 1 0-1zm0 3v-.5a.5.5 0 0 1 1 0v.5h.5a.5.5 0 0 1 0 1h-2a.5.5 0 0 1 0-1z"/></svg>`;
+         const ikonTamam = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 16 16"><path d="M12.736 4.264a.5.5 0 0 1 .708 0l1 1a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708 0l-3.5-3.5a.5.5 0 1 1 .708-.708L5 11.293l6.736-6.736a.5.5 0 0 1 .708 0z"/></svg>`;
+         const ikonSil = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M11 1.5v1h3.5a.5.5 0 0 1 0 1h-.538l-.853 10.66A2 2 0 0 1 11.115 16h-6.23a2 2 0 0 1-1.994-1.84L2.038 3.5H1.5a.5.5 0 0 1 0-1H5v-1A1.5 1.5 0 0 1 6.5 0h3A1.5 1.5 0 0 1 11 1.5m-5 0v1h4v-1a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5M4.5 5.029l.5 8.5a.5.5 0 1 0 .998-.06l-.5-8.5a.5.5 0 1 0-.998.06m6.53-.528a.5.5 0 0 0-.528.47l-.5 8.5a.5.5 0 0 0 .998.058l.5-8.5a.5.5 0 0 0-.47-.528M8 4.5a.5.5 0 0 0-.5.5v8.5a.5.5 0 0 0 1 0V5a.5.5 0 0 0-.5-.5"/></svg>`;
+
+
+        let odevBilgiHtml = '';
+        let aksiyonHtml = '';
+        let kartSiniflari = 'odev-karti';
+        let ikonHtml = isTamamlandi ? ikonTamam : (isAktifGorunen ? ikonAktif : ikonAktif); // Aktif veya zamanı gelmişse aktif ikon
+
+        if (isTamamlandi) {
+            kartSiniflari += ' tamamlandi';
+            const sonuc = odev.sonuc || {};
+            let netSayisiNum = parseFloat(sonuc.netSayisi);
+            const netSayisiFormatted = !isNaN(netSayisiNum) && isFinite(netSayisiNum) ? netSayisiNum.toFixed(2) : 'N/A';
+            const tamamlanmaTarihiStr = odev.tamamlanmaTarihi?.toDate ? `Tamamlandı: ${dateFormatter.format(odev.tamamlanmaTarihi.toDate())}` : '';
+            odevBilgiHtml = `
+              <div class="info-row">
+                <span class="label">Net</span>
+                <span class="value net-label">${netSayisiFormatted}</span>
+              </div>
+              <div class="info-row">
+                <span class="label">Skor</span>
+                <span class="value">${sonuc.dogruSayisi ?? 0} D / ${sonuc.yanlisSayisi ?? 0} Y</span>
+              </div>
+              ${tamamlanmaTarihiStr ? `<div class="info-row"><span class="label">Tarih</span><span class="value">${tamamlanmaTarihiStr}</span></div>` : ''}`;
+            aksiyonHtml = ''; // Tamamlanan ödevde aksiyon yok
+        } else if (isAktifGorunen) { // Sadece aktif ve zamanı gelmiş olanlar için bilgi/aksiyon göster
+            let link = '#';
+            let baslaButonDisabled = true;
+
+            if (isReadingSinavi) {
+                const toplamGerekenSayi = Number(odev.soruSayisi) || 1;
+                const safeStartFrom = Math.max(0, Number(startFrom) || 0);
+                const tumTarihceUzunlugu = odev.cozulenMetinler?.length || 0;
+                // Sadece BU ödev içinde kaç metin çözüldüğünü hesapla
+                const buOdevdeCozulenSayi = Math.max(0, tumTarihceUzunlugu - safeStartFrom);
+
+                // Butonu kilitleme koşulu: Bu ödevde çözülen, gereken sayıya eşit veya büyükse
+                if (buOdevdeCozulenSayi >= toplamGerekenSayi) {
+                    baslaButonDisabled = true;
+                    // Eğer durum hala 'atanmis' ise bu bir hata olabilir, loglayabiliriz.
+                    if(odev.durum !== 'tamamlandi') {
+                      console.warn(`Reading ödevi (${odevId}) aktif görünüyor ama ${buOdevdeCozulenSayi}/${toplamGerekenSayi} çözülmüş. Buton kilitlendi.`);
+                    }
+                } else {
+                    link = `sinav_reading.html?kategori=${encodeURIComponent(odev.kategori)}&odevId=${encodeURIComponent(odevId)}&soruSayisi=${toplamGerekenSayi}&startFrom=${safeStartFrom}`;
+                    baslaButonDisabled = false;
+                }
+
+                const yuzde = (toplamGerekenSayi > 0) ? Math.min(100, (buOdevdeCozulenSayi / toplamGerekenSayi) * 100) : 0; // %100'ü geçmesin
+
+                odevBilgiHtml = `
+                    <div class="info-row progress-bar-container">
+                        <span class="label">İlerleme: ${buOdevdeCozulenSayi} / ${toplamGerekenSayi} Metin</span>
+                        <div class="progress-bar"><div class="progress-bar-inner" style="width:${yuzde}%"></div></div>
+                    </div>
+                    <div class="info-row"><span class="label">Atanma Tarihi</span><span class="value">${atanmaTarihi}</span></div>
+                    <div class="info-row"><span class="label">Başlangıç</span><span class="value">${safeStartFrom + 1}. metin</span></div>`;
+
+            } else if (odev.kategori && odev.soruSayisi > 0) { // Diğer sınav türleri
+                link = `sinav.html?kategori=${encodeURIComponent(odev.kategori)}&soruSayisi=${encodeURIComponent(odev.soruSayisi)}&odevId=${encodeURIComponent(odevId)}`;
+                baslaButonDisabled = false; // Diğer sınavlar tek seferlik, hep başlatılabilir
+                odevBilgiHtml = `
+                    <div class="info-row"><span class="label">Tip</span><span class="value">${odev.soruSayisi} Soru</span></div>
+                    <div class="info-row"><span class="label">Atanma Tarihi</span><span class="value">${atanmaTarihi}</span></div>`;
+            } else { // Geçersiz ödev verisi
+                baslaButonDisabled = true;
+                odevBilgiHtml = `
+                    <div class="info-row"><span class="label">Tip</span><span class="value" style="color:red;">Hatalı Veri</span></div>
+                    <div class="info-row"><span class="label">Atanma Tarihi</span><span class="value">${atanmaTarihi}</span></div>`;
+            }
+
+            const baslaButonMetni = baslaButonDisabled ? 'Başlatılamıyor' : 'Başla →';
+            aksiyonHtml = `<a href="${link}" class="basla-btn" ${baslaButonDisabled ? 'style="cursor: not-allowed;" onclick="event.preventDefault(); return false;"' : ''}>${baslaButonMetni}</a>`;
+        }
+        // else {
+        // Zamanı gelmemiş ödevler için bilgi/aksiyon göstermiyoruz, bu yüzden else bloğu boş.
+        // İsterseniz buraya "Zamanlanmış: [Tarih]" gibi bir bilgi ekleyebilirsiniz.
+        // }
+
+
+        // Kartın HTML'ini oluştur
+        // Silme butonu her zaman görünür (ama sadece aktif/tamamlanmış kartlarda işlevsel olur)
+        return `
+            <div class="${kartSiniflari}">
+                <button class="delete-btn" data-odevid="${odevId}" title="Ödevi Sil">${ikonSil}</button>
+                <div class="odev-ikon">${ikonHtml}</div>
+                <div class="odev-detay">
+                    <h3>${baslik}</h3>
+                    <span class="kategori-label">${kategoriAdi}</span>
+                </div>
+                <div class="odev-bilgi">${odevBilgiHtml}</div>
+                ${aksiyonHtml ? `<div class="odev-aksiyon">${aksiyonHtml}</div>` : ''}
+            </div>`;
+    }
+    // --- GÜNCELLENMİŞ FONKSİYON BİTTİ ---
+
 
     function attachDeleteListeners() {
+      // Bu fonksiyon öncekiyle aynı, tekrar eklemeye gerek yok
+      // Mevcut attachDeleteListeners fonksiyonunuzu burada tutun.
       document.querySelectorAll('.delete-btn').forEach(button => {
+        // Önceki listener'ı kaldır (varsa) ve yenisini ekle
         const newButton = button.cloneNode(true);
         button.parentNode.replaceChild(newButton, button);
         newButton.addEventListener('click', (e) => {
           const odevId = e.currentTarget.dataset.odevid;
-          if (odevId) {
+          if (odevId && currentUser) { // currentUser kontrolü eklendi
             showOnayPopup('Bu ödevi silmek istediğinize emin misiniz? Bu işlem geri alınamaz.', () => { odeviSil(odevId); });
+          } else {
+             console.error("Silme butonu için odevId veya currentUser eksik.");
           }
         });
       });
     }
 
     async function odeviSil(odevId) {
-      if (!currentUser || !odevId) {
-        console.error("Silme işlemi için kullanıcı veya ödev ID eksik.");
-        alert("Ödev silinirken bir hata oluştu.");
-        return;
-      }
-      const odevRef = doc(db, "odevler", currentUser.uid, "gorevler", odevId);
-      try { await deleteDoc(odevRef); console.log(`Ödev (${odevId}) başarıyla silindi.`); }
-      catch (error) { console.error("Ödev silinirken Firestore hatası:", error); alert("Ödev silinirken bir hata oluştu. Lütfen tekrar deneyin."); }
+      // Bu fonksiyon öncekiyle aynı, tekrar eklemeye gerek yok
+      // Mevcut odeviSil fonksiyonunuzu burada tutun.
+       if (!currentUser || !odevId) {
+         console.error("Silme işlemi için kullanıcı veya ödev ID eksik.");
+         alert("Ödev silinirken bir hata oluştu.");
+         return;
+       }
+       const odevRef = doc(db, "odevler", currentUser.uid, "gorevler", odevId);
+       try {
+           await deleteDoc(odevRef);
+           console.log(`Ödev (${odevId}) başarıyla silindi.`);
+           // Arayüz otomatik olarak onSnapshot ile güncellenecektir.
+       } catch (error) {
+           console.error("Ödev silinirken Firestore hatası:", error);
+           alert("Ödev silinirken bir hata oluştu. Lütfen tekrar deneyin.");
+       }
     }
 
     function showOnayPopup(mesaj, callback) {
-      const popup = document.getElementById('onay-popup');
-      if (!popup) return;
-      popup.querySelector('#onay-mesaji').innerHTML = mesaj;
-      popup.classList.add('show');
+      // Bu fonksiyon öncekiyle aynı, tekrar eklemeye gerek yok
+      // Mevcut showOnayPopup fonksiyonunuzu burada tutun.
+       const popup = document.getElementById('onay-popup');
+       if (!popup) return;
+       popup.querySelector('#onay-mesaji').innerHTML = mesaj;
+       popup.classList.add('show');
 
-      const iptalBtn = popup.querySelector('#onay-iptal-btn');
-      const devamBtn = popup.querySelector('#onay-devam-btn');
-      const newDevamBtn = devamBtn.cloneNode(true); devamBtn.parentNode.replaceChild(newDevamBtn, devamBtn);
-      const newIptalBtn = iptalBtn.cloneNode(true); iptalBtn.parentNode.replaceChild(newIptalBtn, iptalBtn);
+       const iptalBtn = popup.querySelector('#onay-iptal-btn');
+       const devamBtn = popup.querySelector('#onay-devam-btn');
 
-      const devamListener = () => { popup.classList.remove('show'); callback(); };
-      const iptalListener = () => { popup.classList.remove('show'); };
+       // Önceki listener'ları temizlemek için butonları klonla
+       const newDevamBtn = devamBtn.cloneNode(true);
+       devamBtn.parentNode.replaceChild(newDevamBtn, devamBtn);
+       const newIptalBtn = iptalBtn.cloneNode(true);
+       iptalBtn.parentNode.replaceChild(newIptalBtn, iptalBtn);
 
-      newDevamBtn.addEventListener('click', devamListener, { once: true });
-      newIptalBtn.addEventListener('click', iptalListener, { once: true });
+       const devamListener = () => {
+         popup.classList.remove('show');
+         callback();
+       };
+       const iptalListener = () => {
+         popup.classList.remove('show');
+       };
+
+       // Yeni butonlara listener ekle (sadece bir kere çalışacak şekilde)
+       newDevamBtn.addEventListener('click', devamListener, { once: true });
+       newIptalBtn.addEventListener('click', iptalListener, { once: true });
     }
+
   </script>
 </body>
 </html>
