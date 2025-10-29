@@ -1,237 +1,277 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>Elektronik Sınav - Okuduğunu Anlama</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com"/>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+
     <style>
-      :root {
-          --primary-color: #0d3d6e; --primary-light: #1a5a96; --primary-lighter: #e7f0f7;
-          --danger-color: #d9534f; --danger-dark: #c9302c;
-          --success-color: #28a745; --success-dark: #1e7e34;
-          --info-color: #5bc0de; --info-dark: #31b0d5;
-          --secondary-color: #6c757d; --secondary-dark: #5a6268;
-          --background-color: #f4f7fa; --card-background: #ffffff;
-          --text-color: #333; --text-light: #555;
-          --border-color: #e0e0e0; --shadow: 0 4px 15px rgba(0, 0, 0, 0.07);
-          --highlight-color: #fffb8b;
+      :root{
+        --primary-color:#0d3d6e; --primary-light:#1a5a96; --primary-lighter:#e7f0f7;
+        --danger-color:#d9534f; --danger-dark:#c9302c;
+        --success-color:#28a745; --success-dark:#1e7e34;
+        --info-color:#5bc0de; --info-dark:#31b0d5;
+        --secondary-color:#6c757d; --secondary-dark:#5a6268;
+        --background-color:#f4f7fa; --card-background:#ffffff;
+        --text-color:#333; --text-light:#555;
+        --border-color:#e0e0e0; --shadow:0 4px 15px rgba(0,0,0,.07);
+        --highlight-color:#fffb8b;
       }
-      * { box-sizing: border-box; margin: 0; padding: 0; }
-      body {
-          font-family: 'Poppins', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-          background-color: var(--background-color); color: var(--text-color);
-          -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;
+      *{box-sizing:border-box;margin:0;padding:0}
+      body{
+        font-family:'Poppins',-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+        background:var(--background-color); color:var(--text-color);
+        -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;
       }
-      .container { width: 100%; max-width: 1800px; margin: 0 auto; padding: 0 15px; }
-      
-      .top-header { background: linear-gradient(135deg, var(--primary-light) 0%, var(--primary-light) 100%); color: white; padding: 15px 30px; box-shadow: var(--shadow); user-select: none; }
-      .top-header h1 { font-size: 1.3em; margin: 0; font-weight: 600; text-align: center; }
-      .status-bar { background-color: var(--card-background); border-bottom: 1px solid var(--border-color); padding: 12px 30px; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; font-size: 0.9em; gap: 20px; user-select: none;}
-      .user-info, .time-info { display: flex; align-items: center; gap: 15px; }
-      .time-info .time-label { color: var(--text-light); font-weight: 500; }
-      .time-info .time-box { font-weight: 700; font-size: 1.5em; color: var(--danger-color); font-family: 'Courier New', Courier, monospace; }
-      .status-controls { display: flex; gap: 10px; }
-      .status-controls button { border: none; border-radius: 8px; padding: 10px 18px; font-weight: 600; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 8px; }
-      .status-controls button:hover { transform: translateY(-2px); }
-      #sinav-sonlandir-btn { background-color: var(--danger-color); color: white; }
-      #sinav-sonlandir-btn:hover { background-color: var(--danger-dark); }
-      #print-btn-live { background-color: var(--secondary-color); color: white; }
-      #print-btn-live:hover { background-color: var(--secondary-dark); }
-      #sonuclara-don-btn, #print-btn-inceleme { background-color: var(--info-color); color: white; }
-      #sonuclara-don-btn:hover, #print-btn-inceleme:hover { background-color: var(--info-dark); }
-      
-      .ana-icerik { display: flex; gap: 0; align-items: stretch; margin-top: 20px; }
-      .sol-panel-paragraf { flex: 0 0 50%; min-width: 250px; background-color: var(--card-background); padding: 30px; border-radius: 12px; box-shadow: var(--shadow); position: sticky; top: 20px; max-height: calc(100vh - 40px); overflow-y: auto; }
-      .sol-panel-paragraf h2 { margin-top: 0; color: var(--primary-color); border-bottom: 2px solid var(--primary-lighter); padding-bottom: 15px; margin-bottom: 20px; user-select: none; }
-      .sol-panel-paragraf p { line-height: 1.9; font-size: 1.1em; color: #444; }
-      .highlight { background-color: var(--highlight-color); cursor: pointer; }
-      
-      .resizer { flex: 0 0 10px; cursor: col-resize; background-color: var(--border-color); position: sticky; top: 20px; height: calc(100vh - 40px); margin: 0 8px; border-radius: 5px; transition: background-color 0.2s; user-select: none; }
-      .resizer:hover, .resizer.resizing { background-color: var(--primary-light); }
+      .container{width:100%;max-width:1800px;margin:0 auto;padding:0 15px}
 
-      .sag-panel-soru { flex: 1 1 auto; min-width: 300px; display: flex; flex-direction: column; gap: 20px; }
-      .soru-kutusu { background-color: var(--card-background); padding: 25px; border-radius: 12px; box-shadow: var(--shadow); user-select: none; }
-      .soru-navigasyon { display: flex; justify-content: space-between; align-items: center; margin-top: 20px; user-select: none; }
-      .nav-button { background-color: var(--primary-color); color: white; border: none; padding: 12px 30px; border-radius: 8px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
-      .nav-button:hover:not(:disabled) { background-color: var(--primary-light); transform: translateY(-2px); }
-      .nav-button:disabled { background-color: #ccc; cursor: not-allowed; }
-      .question-number { font-size: 1.5em; font-weight: 600; color: var(--primary-color); margin-bottom: 15px; border-bottom: 1px solid var(--border-color); padding-bottom: 10px; }
-      .question-text { font-size: 1.25em; line-height: 1.6; margin-bottom: 30px; font-weight: 500; }
-      .options-list { list-style: none; padding: 0; display: flex; flex-direction: column; gap: 10px; }
-      .options-list li { display: flex; align-items: center; gap: 15px; font-size: 1.05em; padding: 12px; border-radius: 8px; border: 2px solid var(--border-color); cursor: pointer; transition: all 0.2s; }
-      .options-list li.selected { border-color: var(--primary-color); background-color: var(--primary-lighter); font-weight: 500; }
-      .options-list li:hover { background-color: #f8f9fa; border-color: var(--primary-light); }
-      .options-list li.strikethrough label { text-decoration: line-through; color: #aaa; }
-      .options-list label { flex-grow: 1; cursor: pointer;}
-      .radio-custom { width: 24px; height: 24px; border: 2px solid var(--border-color); border-radius: 50%; display: inline-block; position: relative; flex-shrink: 0; transition: all 0.2s; }
-      .options-list li.selected .radio-custom { border-color: var(--primary-color); transform: scale(1.1); }
-      .options-list li.selected .radio-custom::after { content: ''; width: 14px; height: 14px; background: var(--primary-color); border-radius: 50%; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0); animation: popIn 0.2s forwards; }
-      @keyframes popIn { from { transform: translate(-50%, -50%) scale(0); } to { transform: translate(-50%, -50%) scale(1); } }
-      
-      .options-list.review-mode li { cursor: default; user-select: none; }
-      .options-list.review-mode li:hover { background-color: transparent; }
-      .options-list.review-mode li.review-correct { border-color: var(--success-dark); background-color: #eaf6ec; }
-      .options-list.review-mode li.review-incorrect { border-color: var(--danger-dark); background-color: #fdeded; }
-      .options-list.review-mode li.review-correct.review-student-choice .radio-custom, .options-list.review-mode li.review-correct .radio-custom { border-color: var(--success-dark); }
-      .options-list.review-mode li.review-incorrect.review-student-choice .radio-custom { border-color: var(--danger-dark); }
-      .options-list.review-mode li.review-correct .radio-custom::after { background: var(--success-dark); }
-      .options-list.review-mode li.review-incorrect.review-student-choice .radio-custom::after { content: '✕'; color: var(--danger-dark); font-weight: bold; background: transparent; width: auto; height: auto; font-size: 20px; line-height: 1; }
-      
-      #sonuc-arayuzu, #inceleme-arayuzu { display: none; }
-      .sonuc-icerik { display: flex; gap: 20px; align-items: flex-start; }
-      .sonuc-sol-panel { flex: 5; }
-      .sonuc-sag-panel { flex: 4; position: sticky; top: 20px; }
-      .panel { background-color: var(--card-background); border-radius: 12px; box-shadow: var(--shadow); padding: 25px; border: 1px solid var(--border-color); user-select: none;}
-      .summary-box h2 { margin-top: 0; margin-bottom: 20px; font-weight: 600; padding-bottom: 10px; border-bottom: 1px solid var(--border-color); }
-      .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 15px; }
-      .stat-item { padding: 20px 15px; border-radius: 8px; text-align: center; }
-      .stat-item .label { font-size: 0.9em; font-weight: 500; text-transform: uppercase; }
-      .stat-item .value { font-size: 2.2em; font-weight: 700; }
-      .stat-item.dogru { background-color: #eaf6ec; color: var(--success-dark); }
-      .stat-item.yanlis { background-color: #fdeded; color: var(--danger-dark); }
-      .stat-item.bos { background-color: #f1f3f5; color: #555; }
-      .stat-item.net { background-color: #eef5ff; color: var(--primary-light); }
-      .action-buttons { display: flex; flex-direction: column; gap: 10px; margin-top: 20px; }
-      .action-buttons button { width: 100%; padding: 12px; font-size: 1em; font-weight: 600; cursor: pointer; color: white; border: none; border-radius: 8px; transition: background-color 0.2s; }
-      
-      /* --- HTML'de GÜNCELLENDİ --- */
-      #odevlere-don-btn { background-color: var(--primary-color); } 
-      #sorulari-incele-btn { background-color: var(--info-color); }
-      #devam-et-btn { background-color: var(--success-color); }
-      #devam-et-btn:hover { background-color: var(--success-dark); }
-      /* --- GÜNCELLEME SONU --- */
+      .top-header{background:linear-gradient(135deg,var(--primary-light) 0%,var(--primary-light) 100%);color:#fff;padding:15px 30px;box-shadow:var(--shadow);user-select:none}
+      .top-header h1{font-size:1.3em;margin:0;font-weight:600;text-align:center}
 
-      #optik-form-sonuc { max-height: 70vh; overflow-y: auto; padding-right: 15px; display: flex; flex-direction: column; gap: 12px; }
-      .cevap-anahtari-satir { display: flex; align-items: center; background-color: #f8f9fa; padding: 10px 15px; border-radius: 8px; border: 1px solid var(--border-color); }
-      .cevap-soru-no { font-weight: 600; color: var(--primary-color); width: 80px; }
-      .cevap-secenekler { display: flex; gap: 8px; flex-grow: 1; }
-      .cevap-secenek { width: 38px; height: 38px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-weight: 500; border: 2px solid transparent; background-color: #fff; position: relative; }
-      .cevap-secenek.dogru-cevap { border-color: var(--success-color); }
-      .cevap-secenek.dogru-cevap::after { content: '✓'; position: absolute; bottom: -8px; right: -8px; background-color: var(--success-color); color: white; border-radius: 50%; width: 20px; height: 20px; font-size: 14px; line-height: 20px; text-align: center; }
-      .cevap-secenek.ogrenci-cevabi { background-color: #eef5ff; box-shadow: 0 0 0 3px var(--primary-light); }
-      .cevap-secenek.yanlis-cevap { background-color: #fdeded; box-shadow: 0 0 0 3px var(--danger-color); }
-      .cevap-durum { font-weight: 600; font-size: 0.85em; padding: 5px 12px; border-radius: 15px; color: white; text-align: center; min-width: 80px; }
-      .cevap-durum.durum-dogru { background-color: var(--success-color); }
-      .cevap-durum.durum-yanlis { background-color: var(--danger-color); }
-      .cevap-durum.durum-bos { background-color: var(--text-light); }
+      .status-bar{background:var(--card-background);border-bottom:1px solid var(--border-color);padding:12px 30px;display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;font-size:.9em;gap:20px;user-select:none}
+      .user-info,.time-info{display:flex;align-items:center;gap:15px}
+      .time-info .time-label{color:var(--text-light);font-weight:500}
+      .time-info .time-box{font-weight:700;font-size:1.5em;color:var(--danger-color);font-family:'Courier New',Courier,monospace}
+      .status-controls{display:flex;gap:10px}
+      .status-controls button{border:none;border-radius:8px;padding:10px 18px;font-weight:600;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:8px}
+      .status-controls button:hover{transform:translateY(-2px)}
+      #sinav-sonlandir-btn{background:var(--danger-color);color:#fff}
+      #sinav-sonlandir-btn:hover{background:var(--danger-dark)}
+      #print-btn-live{background:var(--secondary-color);color:#fff}
+      #print-btn-live:hover{background:var(--secondary-dark)}
+      #sonuclara-don-btn,#print-btn-inceleme{background:var(--info-color);color:#fff}
+      #sonuclara-don-btn:hover,#print-btn-inceleme:hover{background:var(--info-dark)}
 
-      .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.6); z-index: 1000; display: flex; justify-content: center; align-items: center; opacity: 0; visibility: hidden; transition: all 0.3s ease-in-out; }
-      .modal-overlay.show { opacity: 1; visibility: visible; }
-      .modal-content { background: white; padding: 30px 40px; border-radius: 12px; text-align: center; max-width: 90%; width: 500px; user-select: none; }
-      .modal-content p { font-size: 1.2em; margin: 0 0 20px 0; }
-      .modal-buttons { display: flex; gap: 15px; justify-content: center;}
-      .modal-buttons button { border: none; padding: 12px 30px; border-radius: 8px; font-size: 1em; cursor: pointer; margin-top: 10px; }
-      .modal-buttons .cancel { background-color: #6c757d; color: white; }
-      .modal-buttons .confirm { background-color: var(--danger-color); color: white; }
-      .countdown-timer { font-size: 3em; font-weight: 700; color: var(--primary-color); margin: 15px 0; }
-      #bilgi-kapat-btn { background-color: var(--primary-color); color: white; transition: background-color 0.2s; }
-      #bilgi-kapat-btn:hover { background-color: var(--primary-light); }
+      .ana-icerik{display:flex;gap:0;align-items:stretch;margin-top:20px}
+      .sol-panel-paragraf{flex:0 0 50%;min-width:250px;background:var(--card-background);padding:30px;border-radius:12px;box-shadow:var(--shadow);position:sticky;top:20px;max-height:calc(100vh - 40px);overflow-y:auto}
+      .sol-panel-paragraf h2{margin-top:0;color:var(--primary-color);border-bottom:2px solid var(--primary-lighter);padding-bottom:15px;margin-bottom:20px;user-select:none}
+      .sol-panel-paragraf p{line-height:1.9;font-size:1.1em;color:#444}
+      .highlight{background:var(--highlight-color);cursor:pointer}
 
-      @media (max-width: 1024px) {
-          .ana-icerik, .sonuc-icerik { flex-direction: column; gap: 20px; }
-          .sol-panel-paragraf, .sonuc-sag-panel { position: static; max-height: 45vh; width: 100%; }
-          .resizer { display: none; }
-          .sag-panel-soru { width: 100%; }
+      .resizer{flex:0 0 10px;cursor:col-resize;background:var(--border-color);position:sticky;top:20px;height:calc(100vh - 40px);margin:0 8px;border-radius:5px;transition:background-color .2s;user-select:none}
+      .resizer:hover,.resizer.resizing{background:var(--primary-light)}
+
+      .sag-panel-soru{flex:1 1 auto;min-width:300px;display:flex;flex-direction:column;gap:20px}
+      .soru-kutusu{background:var(--card-background);padding:25px;border-radius:12px;box-shadow:var(--shadow);user-select:none}
+      .soru-navigasyon{display:flex;justify-content:space-between;align-items:center;margin-top:20px;user-select:none}
+      .nav-button{background:var(--primary-color);color:#fff;border:none;padding:12px 30px;border-radius:8px;font-weight:600;cursor:pointer;transition:all .2s}
+      .nav-button:hover:not(:disabled){background:var(--primary-light);transform:translateY(-2px)}
+      .nav-button:disabled{background:#ccc;cursor:not-allowed}
+
+      .question-number{font-size:1.5em;font-weight:600;color:var(--primary-color);margin-bottom:15px;border-bottom:1px solid var(--border-color);padding-bottom:10px}
+      .question-text{font-size:1.25em;line-height:1.6;margin-bottom:30px;font-weight:500}
+      .options-list{list-style:none;padding:0;display:flex;flex-direction:column;gap:10px}
+      .options-list li{display:flex;align-items:center;gap:15px;font-size:1.05em;padding:12px;border-radius:8px;border:2px solid var(--border-color);cursor:pointer;transition:all .2s}
+      .options-list li.selected{border-color:var(--primary-color);background:var(--primary-lighter);font-weight:500}
+      .options-list li:hover{background:#f8f9fa;border-color:var(--primary-light)}
+      .options-list li.strikethrough label{text-decoration:line-through;color:#aaa}
+      .options-list label{flex-grow:1;cursor:pointer}
+      .radio-custom{width:24px;height:24px;border:2px solid var(--border-color);border-radius:50%;display:inline-block;position:relative;flex-shrink:0;transition:all .2s}
+      .options-list li.selected .radio-custom{border-color:var(--primary-color);transform:scale(1.1)}
+      .options-list li.selected .radio-custom::after{content:'';width:14px;height:14px;background:var(--primary-color);border-radius:50%;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) scale(0);animation:popIn .2s forwards}
+      @keyframes popIn{from{transform:translate(-50%,-50%) scale(0)}to{transform:translate(-50%,-50%) scale(1)}}
+
+      .options-list.review-mode li{cursor:default;user-select:none}
+      .options-list.review-mode li:hover{background:transparent}
+      .options-list.review-mode li.review-correct{border-color:var(--success-dark);background:#eaf6ec}
+      .options-list.review-mode li.review-incorrect{border-color:var(--danger-dark);background:#fdeded}
+      .options-list.review-mode li.review-correct.review-student-choice .radio-custom,
+      .options-list.review-mode li.review-correct .radio-custom{border-color:var(--success-dark)}
+      .options-list.review-mode li.review-incorrect.review-student-choice .radio-custom{border-color:var(--danger-dark)}
+      .options-list.review-mode li.review-correct .radio-custom::after{background:var(--success-dark)}
+      .options-list.review-mode li.review-incorrect.review-student-choice .radio-custom::after{content:'✕';color:var(--danger-dark);font-weight:bold;background:transparent;width:auto;height:auto;font-size:20px;line-height:1}
+
+      #sonuc-arayuzu,#inceleme-arayuzu{display:none}
+      .sonuc-icerik{display:flex;gap:20px;align-items:flex-start}
+      .sonuc-sol-panel{flex:5}
+      .sonuc-sag-panel{flex:4;position:sticky;top:20px}
+      .panel{background:var(--card-background);border-radius:12px;box-shadow:var(--shadow);padding:25px;border:1px solid var(--border-color);user-select:none}
+      .summary-box h2{margin-top:0;margin-bottom:20px;font-weight:600;padding-bottom:10px;border-bottom:1px solid var(--border-color)}
+      .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:15px}
+      .stat-item{padding:20px 15px;border-radius:8px;text-align:center}
+      .stat-item .label{font-size:.9em;font-weight:500;text-transform:uppercase}
+      .stat-item .value{font-size:2.2em;font-weight:700}
+      .stat-item.dogru{background:#eaf6ec;color:var(--success-dark)}
+      .stat-item.yanlis{background:#fdeded;color:var(--danger-dark)}
+      .stat-item.bos{background:#f1f3f5;color:#555}
+      .stat-item.net{background:#eef5ff;color:var(--primary-light)}
+      .action-buttons{display:flex;flex-direction:column;gap:10px;margin-top:20px}
+      .action-buttons button{width:100%;padding:12px;font-size:1em;font-weight:600;cursor:pointer;color:#fff;border:none;border-radius:8px;transition:background-color .2s}
+      #odevlere-don-btn{background:var(--primary-color)}
+      #sorulari-incele-btn{background:var(--info-color)}
+      #devam-et-btn{background:var(--success-color)}
+      #devam-et-btn:hover{background:var(--success-dark)}
+
+      #optik-form-sonuc{max-height:70vh;overflow-y:auto;padding-right:15px;display:flex;flex-direction:column;gap:12px}
+      .cevap-anahtari-satir{display:flex;align-items:center;background:#f8f9fa;padding:10px 15px;border-radius:8px;border:1px solid var(--border-color)}
+      .cevap-soru-no{font-weight:600;color:var(--primary-color);width:80px}
+      .cevap-secenekler{display:flex;gap:8px;flex-grow:1}
+      .cevap-secenek{width:38px;height:38px;border-radius:50%;display:flex;justify-content:center;align-items:center;font-weight:500;border:2px solid transparent;background:#fff;position:relative}
+      .cevap-secenek.dogru-cevap{border-color:var(--success-color)}
+      .cevap-secenek.dogru-cevap::after{content:'✓';position:absolute;bottom:-8px;right:-8px;background:var(--success-color);color:#fff;border-radius:50%;width:20px;height:20px;font-size:14px;line-height:20px;text-align:center}
+      .cevap-secenek.ogrenci-cevabi{background:#eef5ff;box-shadow:0 0 0 3px var(--primary-light)}
+      .cevap-secenek.yanlis-cevap{background:#fdeded;box-shadow:0 0 0 3px var(--danger-color)}
+      .cevap-durum{font-weight:600;font-size:.85em;padding:5px 12px;border-radius:15px;color:#fff;text-align:center;min-width:80px}
+      .cevap-durum.durum-dogru{background:var(--success-color)}
+      .cevap-durum.durum-yanlis{background:var(--danger-color)}
+      .cevap-durum.durum-bos{background:var(--text-light)}
+
+      .modal-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.6);z-index:1000;display:flex;justify-content:center;align-items:center;opacity:0;visibility:hidden;transition:all .3s ease-in-out}
+      .modal-overlay.show{opacity:1;visibility:visible}
+      .modal-content{background:#fff;padding:30px 40px;border-radius:12px;text-align:center;max-width:90%;width:500px;user-select:none}
+      .modal-content p{font-size:1.2em;margin:0 0 20px 0}
+      .modal-buttons{display:flex;gap:15px;justify-content:center}
+      .modal-buttons button{border:none;padding:12px 30px;border-radius:8px;font-size:1em;cursor:pointer;margin-top:10px}
+      .modal-buttons .cancel{background:#6c757d;color:#fff}
+      .modal-buttons .confirm{background:var(--danger-color);color:#fff}
+      .countdown-timer{font-size:3em;font-weight:700;color:var(--primary-color);margin:15px 0}
+      #bilgi-kapat-btn{background:var(--primary-color);color:#fff;transition:background-color .2s}
+      #bilgi-kapat-btn:hover{background:var(--primary-light)}
+
+      @media (max-width:1024px){
+        .ana-icerik,.sonuc-icerik{flex-direction:column;gap:20px}
+        .sol-panel-paragraf,.sonuc-sag-panel{position:static;max-height:45vh;width:100%}
+        .resizer{display:none}
+        .sag-panel-soru{width:100%}
       }
     </style>
 </head>
 <body>
-    <div id="app-container">
-        <div id="sinav-arayuzu">
-            <header class="top-header"><h1 id="sinav-baslik">Okuduğunu Anlama Sınavı</h1></header>
-            <div class="status-bar">
-                <div class="user-info"><strong class="kullanici-ad-soyad"></strong></div>
-                <div class="time-info"><span class="time-label">Kalan Süre:</span><span id="main-exam-timer" class="time-box">--:--</span></div>
-                <div class="status-controls">
-                    <button id="print-btn-live">📄 Yazdır / PDF</button>
-                    <button id="sinav-sonlandir-btn">🛑 Sınavı Sonlandır</button>
-                </div>
-            </div>
-            <div class="container">
-                <div class="ana-icerik">
-                    <aside id="paragraf-paneli" class="sol-panel-paragraf"></aside>
-                    <div class="resizer" id="resizer"></div>
-                    <main class="sag-panel-soru">
-                        <div id="soru-paneli" class="soru-kutusu"></div>
-                        <div class="soru-navigasyon">
-                            <button id="prev-btn" class="nav-button">Önceki Soru</button>
-                            <button id="next-btn" class="nav-button">Sonraki Soru</button>
-                        </div>
-                    </main>
-                </div>
-            </div>
+  <div id="app-container">
+    <div id="sinav-arayuzu">
+      <header class="top-header"><h1 id="sinav-baslik">Okuduğunu Anlama Sınavı</h1></header>
+      <div class="status-bar">
+        <div class="user-info"><strong class="kullanici-ad-soyad"></strong></div>
+        <div class="time-info">
+          <span class="time-label">Kalan Süre:</span>
+          <span id="main-exam-timer" class="time-box">--:--</span>
         </div>
+        <div class="status-controls">
+          <button id="print-btn-live">📄 Yazdır / PDF</button>
+          <button id="sinav-sonlandir-btn">🛑 Sınavı Sonlandır</button>
+        </div>
+      </div>
 
-        <div id="sonuc-arayuzu">
-            <header class="top-header"><h1>Sınav Sonuç Raporu: <span id="sonuc-kullanici-ad-soyad"></span></h1></header>
-            <div class="container">
-                <div class="sonuc-icerik">
-                    <div class="sonuc-sol-panel panel">
-                        <h3>Cevap Anahtarı (Bu Metin İçin)</h3>
-                        <div id="optik-form-sonuc"></div>
-                    </div>
-                    <aside class="sonuc-sag-panel">
-                        <div class="summary-box panel">
-                            <h2>Bu Metnin Analizi</h2>
-                            <div class="stats">
-                                <div class="stat-item dogru"><div class="label">DOĞRU</div><div id="dogru-sayisi" class="value">0</div></div>
-                                <div class="stat-item yanlis"><div class="label">YANLIŞ</div><div id="yanlis-sayisi" class="value">0</div></div>
-                                <div class="stat-item bos"><div class="label">BOŞ</div><div id="bos-sayisi" class="value">0</div></div>
-                                <div class="stat-item net"><div class="label">NET</div><div id="net-sayisi" class="value">0.00</div></div>
-                            </div>
-                        </div>
-                        <div class="action-buttons panel">
-                            <button id="sorulari-incele-btn">Bu Metnin Sorularını İncele</button>
-                            <button id="devam-et-btn" style="display: none;">Devam Et (Sonraki Metin) →</button>
-                            <button id="odevlere-don-btn">Ödevlerime Dön</button> 
-                        </div>
-                    </aside>
-                </div>
+      <div class="container">
+        <div class="ana-icerik">
+          <aside id="paragraf-paneli" class="sol-panel-paragraf"></aside>
+          <div id="resizer" class="resizer"></div>
+          <main class="sag-panel-soru">
+            <div id="soru-paneli" class="soru-kutusu"></div>
+            <div class="soru-navigasyon">
+              <button id="prev-btn" class="nav-button">Önceki Soru</button>
+              <button id="next-btn" class="nav-button">Sonraki Soru</button>
             </div>
+          </main>
         </div>
-        
-        <div id="inceleme-arayuzu">
-             <header class="top-header"><h1>Soruları İncele</h1></header>
-             <div class="status-bar">
-                    <div class="user-info"><strong class="kullanici-ad-soyad-inceleme"></strong></div>
-                    <div class="status-controls">
-                        <button id="print-btn-inceleme">📄 Yazdır / PDF</button>
-                        <button id="sonuclara-don-btn">🔙 Ödevlerime Dön</button>
-                    </div>
-             </div>
-             <div class="container">
-                    <div class="ana-icerik">
-                        <aside id="paragraf-paneli-inceleme" class="sol-panel-paragraf"></aside>
-                        <main class="sag-panel-soru">
-                            <div id="soru-paneli-inceleme" class="soru-kutusu"></div>
-                            <div class="soru-navigasyon">
-                                <button id="prev-btn-inceleme" class="nav-button">Önceki Soru</button>
-                                <button id="next-btn-inceleme" class="nav-button">Sonraki Soru</button>
-                            </div>
-                        </main>
-                    </div>
-             </div>
-        </div>
-
-        <div id="onay-popup" class="modal-overlay"><div class="modal-content"><h2 style="margin-top:0;">Emin misiniz?</h2><p id="onay-mesaji"></p><div class="modal-buttons"><button id="onay-iptal-btn" class="cancel">İptal</button><button id="onay-devam-btn" class="confirm">Evet</button></div></div></div>
-        <div id="bilgi-popup" class="modal-overlay"><div class="modal-content"><h2 style="margin-top:0;">Bilgi</h2><p id="bilgi-mesaji"></p><div class="modal-buttons"><button id="bilgi-kapat-btn">Tamam</button></div></div></div>
-        <div id="sayac-popup" class="modal-overlay"><div class="modal-content"><h2 style="margin-top:0;">Sonuçlar Hazırlanıyor...</h2><div id="gerisayim-sayaci" class="countdown-timer">5</div></div></div>
+      </div>
     </div>
-    
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
-        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
-        import { getFirestore, collection, doc, addDoc, getDoc, updateDoc, serverTimestamp, arrayUnion } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
 
-        const firebaseConfig = { apiKey: "AIzaSyAvaEaHtTwcuCDBIggJGd4w_nzJQM5UlmY", authDomain: "teacher-adminpanel.firebaseapp.com", projectId: "teacher-adminpanel", storageBucket: "teacher-adminpanel.appspot.com", messagingSenderId: "901735644134", appId: "1:901735644134:web:a6aa575a0754de1333f427" };
-        
-        // *** BURASI SİZİN TÜM METİN HAVUZUNUZ ***
-        const SINAV_VERITABANI = {
-        'advanced_reading': [
-                {
+    <div id="sonuc-arayuzu">
+      <header class="top-header">
+        <h1>Sınav Sonuç Raporu: <span id="sonuc-kullanici-ad-soyad"></span></h1>
+      </header>
+      <div class="container">
+        <div class="sonuc-icerik">
+          <div class="sonuc-sol-panel panel">
+            <h3>Cevap Anahtarı (Bu Metin İçin)</h3>
+            <div id="optik-form-sonuc"></div>
+          </div>
+          <aside class="sonuc-sag-panel">
+            <div class="summary-box panel">
+              <h2>Bu Metnin Analizi</h2>
+              <div class="stats">
+                <div class="stat-item dogru"><div class="label">DOĞRU</div><div id="dogru-sayisi" class="value">0</div></div>
+                <div class="stat-item yanlis"><div class="label">YANLIŞ</div><div id="yanlis-sayisi" class="value">0</div></div>
+                <div class="stat-item bos"><div class="label">BOŞ</div><div id="bos-sayisi" class="value">0</div></div>
+                <div class="stat-item net"><div class="label">NET</div><div id="net-sayisi" class="value">0.00</div></div>
+              </div>
+            </div>
+            <div class="action-buttons panel">
+              <button id="sorulari-incele-btn">Bu Metnin Sorularını İncele</button>
+              <button id="devam-et-btn" style="display:none;">Devam Et (Sonraki Metin) →</button>
+              <button id="odevlere-don-btn">Ödevlerime Dön</button>
+            </div>
+          </aside>
+        </div>
+      </div>
+    </div>
+
+    <div id="inceleme-arayuzu">
+      <header class="top-header"><h1>Soruları İncele</h1></header>
+      <div class="status-bar">
+        <div class="user-info"><strong class="kullanici-ad-soyad-inceleme"></strong></div>
+        <div class="status-controls">
+          <button id="print-btn-inceleme">📄 Yazdır / PDF</button>
+          <button id="sonuclara-don-btn">🔙 Ödevlerime Dön</button>
+        </div>
+      </div>
+      <div class="container">
+        <div class="ana-icerik">
+          <aside id="paragraf-paneli-inceleme" class="sol-panel-paragraf"></aside>
+          <main class="sag-panel-soru">
+            <div id="soru-paneli-inceleme" class="soru-kutusu"></div>
+            <div class="soru-navigasyon">
+              <button id="prev-btn-inceleme" class="nav-button">Önceki Soru</button>
+              <button id="next-btn-inceleme" class="nav-button">Sonraki Soru</button>
+            </div>
+          </main>
+        </div>
+      </div>
+    </div>
+
+    <div id="onay-popup" class="modal-overlay">
+      <div class="modal-content">
+        <h2 style="margin-top:0;">Emin misiniz?</h2>
+        <p id="onay-mesaji"></p>
+        <div class="modal-buttons">
+          <button id="onay-iptal-btn" class="cancel">İptal</button>
+          <button id="onay-devam-btn" class="confirm">Evet</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="bilgi-popup" class="modal-overlay">
+      <div class="modal-content">
+        <h2 style="margin-top:0;">Bilgi</h2>
+        <p id="bilgi-mesaji"></p>
+        <div class="modal-buttons">
+          <button id="bilgi-kapat-btn">Tamam</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="sayac-popup" class="modal-overlay">
+      <div class="modal-content">
+        <h2 style="margin-top:0;">Sonuçlar Hazırlanıyor...</h2>
+        <div id="gerisayim-sayaci" class="countdown-timer">5</div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
+    import { getFirestore, collection, doc, addDoc, getDoc, updateDoc, serverTimestamp, arrayUnion } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+
+    /* --- Firebase --- */
+    const firebaseConfig = {
+      apiKey: "AIzaSyAvaEaHtTwcuCDBIggJGd4w_nzJQM5UlmY",
+      authDomain: "teacher-adminpanel.firebaseapp.com",
+      projectId: "teacher-adminpanel",
+      storageBucket: "teacher-adminpanel.appspot.com",
+      messagingSenderId: "901735644134",
+      appId: "1:901735644134:web:a6aa575a0754de1333f427"
+    };
+
+    /* --- METİN HAVUZU (Reading içeriklerini sen dolduracaksın) --- */
+    // ÖNEMLİ: Her metnin benzersiz bir 'passageId'si olmalı (örn: "adv_reading_001")
+    const SINAV_VERITABANI = {
+      advanced_reading: [
+                        {
                  "passageId": "text_passage_01",
         "passageTitle": "Okuma Metni 1",
         "passage": "Measuring more than five feet tall and ten feet long, the Javan rhinoceros is often called the rarest large mammal on earth. None exist in zoos. Like the Indian rhino, the Javan has only one horn; African and\nSumatran rhinos have two. While the Javan rhino habitat once\nextended across southern Asia, now there are fewer than one hundred\nof the animals in Indonesia and under a dozen in Vietnam. Very little is\nknown about Javan rhinos because they lead secretive and solitary lives\nin remote jungles. Until recently, scientists debated whether females even have horns, and most scientific work\nhas had to rely on DNA garnered from dung.\nThe near extinction of the Javan rhino is the direct result of human actions. For centuries, farmers, who favored\nthe same habitat, viewed them as crop eating pests and shot them on sight. During the colonial period, hunters\nslaughtered thousands. Now, human efforts to save them may well prove futile. The Vietnamese herd is probably\ndoomed, as too few remain to maintain the necessary genetic variation. Rhinos from Java cannot supplement the\nVietnamese numbers because in the millions of years since Indonesia separated from the mainland, the two\ngroups have evolved into separate sub-species. In Indonesia, the rhinos are protected on the Ujung Kulon\npeninsula, which is unsettled by humans, and still have sufficient genetic diversity to have a chance at survival.\nIronically, however, the lack of human disturbance allows mature forests to replace the shrubby vegetation the\nanimals prefer. Thus, human benevolence may prove little better for these rhinos than past human\nmaltreatment.",
@@ -2272,654 +2312,1018 @@
       ] // questions dizisi kapanıyor
     }   // <--- VİRGÜL SİLİNDİ
   ] // tüm okuma parçaları dizisi kapanıyor
-};   
+    };
 
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
+    /* --- UI Referansları --- */
+    const ui = {
+      sinavArayuzu: document.getElementById('sinav-arayuzu'),
+      sonucArayuzu: document.getElementById('sonuc-arayuzu'),
+      incelemeArayuzu: document.getElementById('inceleme-arayuzu'),
 
-        const ui = {
-            sinavArayuzu: document.getElementById('sinav-arayuzu'),
-            sonucArayuzu: document.getElementById('sonuc-arayuzu'),
-            incelemeArayuzu: document.getElementById('inceleme-arayuzu'),
-            paragrafPaneli: document.getElementById('paragraf-paneli'),
-            soruPaneli: document.getElementById('soru-paneli'),
-            sonlandirBtn: document.getElementById('sinav-sonlandir-btn'),
-            prevBtn: document.getElementById('prev-btn'),
-            nextBtn: document.getElementById('next-btn'),
-            kullaniciAdSoyad: document.querySelectorAll('.kullanici-ad-soyad'),
-            mainTimer: document.getElementById('main-exam-timer'),
-            sinavBaslik: document.getElementById('sinav-baslik'),
-            devamEtBtn: document.getElementById('devam-et-btn'),
-            odevlereDonBtn: document.getElementById('odevlere-don-btn')
-        };
-        
-        const SINAV_SURESI_DAKIKA = 30; // Her bir metin için süre
-        let state = {};
-        
-        function resetState() {
-            // currentUser'ı koru, geri kalan her şeyi sıfırla
-            state = {
-                currentUser: state.currentUser, 
-                mevcutSoruIndex: 0,
-                mevcutIncelemeIndex: 0,
-                sorular: [],
-                ogrenciCevaplari: {},
-                strikethroughs: {},
-                sinavAktif: false,
-                mainTimerInterval: null,
-                sonSonuc: null,
-                odevId: null,
-                sinavTuru: null,
-                currentPassageId: null, // O an çözülen metnin ID'si
-                toplamMetinSayisi: 0, // Ödevde istenen toplam metin sayısı
-                cozulenMetinSayisi: 0  // Şu ana kadar çözülen metin sayısı
-            };
+      paragrafPaneli: document.getElementById('paragraf-paneli'),
+      soruPaneli: document.getElementById('soru-paneli'),
+
+      sonlandirBtn: document.getElementById('sinav-sonlandir-btn'),
+      prevBtn: document.getElementById('prev-btn'),
+      nextBtn: document.getElementById('next-btn'),
+
+      kullaniciAdSoyad: document.querySelectorAll('.kullanici-ad-soyad'), // Tümünü seç
+      mainTimer: document.getElementById('main-exam-timer'),
+      sinavBaslik: document.getElementById('sinav-baslik'),
+
+      devamEtBtn: document.getElementById('devam-et-btn'),
+      odevlereDonBtn: document.getElementById('odevlere-don-btn'),
+      
+      // İnceleme UI
+      paragrafPaneliInceleme: document.getElementById('paragraf-paneli-inceleme'),
+      soruPaneliInceleme: document.getElementById('soru-paneli-inceleme'),
+      prevBtnInceleme: document.getElementById('prev-btn-inceleme'),
+      nextBtnInceleme: document.getElementById('next-btn-inceleme'),
+      kullaniciAdSoyadInceleme: document.querySelectorAll('.kullanici-ad-soyad-inceleme'),
+
+      // Popuplar
+      onayPopup: document.getElementById('onay-popup'),
+      onayMesaji: document.getElementById('onay-mesaji'),
+      onayIptalBtn: document.getElementById('onay-iptal-btn'),
+      onayDevamBtn: document.getElementById('onay-devam-btn'),
+
+      bilgiPopup: document.getElementById('bilgi-popup'),
+      bilgiMesaji: document.getElementById('bilgi-mesaji'),
+      bilgiKapatBtn: document.getElementById('bilgi-kapat-btn')
+    };
+
+    /* --- Ayarlar / State --- */
+    const SINAV_SURESI_DAKIKA = 30; 
+    let state = {};
+
+    function resetState(keepUser = true) { 
+      const currentUser = keepUser ? state.currentUser : null;
+      state = {
+        currentUser: currentUser,
+        mevcutSoruIndex: 0,
+        mevcutIncelemeIndex: 0,
+
+        sorular: [], 
+        ogrenciCevaplari: {}, 
+        strikethroughs: {}, 
+
+        sinavAktif: false,
+        mainTimerInterval: null,
+        kalanSureSaniye: SINAV_SURESI_DAKIKA * 60, 
+
+        sonSonuc: null, 
+        odevId: null, 
+        sinavTuru: null, 
+
+        currentPassageId: null, 
+        buOdevIcinIstenenMetinSayisi: 0, 
+        buOdevIcinBaslangicIndex: 0, 
+        buOdevIcinCozulenIndex: 0 
+      };
+    }
+
+    /* --- Başlat --- */
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    onAuthStateChanged(auth, async (user) => {
+      if (!user) {
+        window.location.href = 'index.html';
+        return;
+      }
+
+      if (!state.currentUser) {
+         try {
+            const docRef = doc(db, "kullanicilar", user.uid);
+            const docSnap = await getDoc(docRef);
+            state.currentUser = { uid: user.uid, email: user.email, ...(docSnap.exists() ? docSnap.data() : {}) };
+         } catch(err) {
+            console.error("Kullanıcı verisi çekilemedi:", err);
+            state.currentUser = { uid: user.uid, email: user.email, isim: "Öğrenci" }; // Fallback
+         }
+      }
+
+      kullaniciBilgileriniYukle(); // Kullanıcı bilgisi yüklendikten hemen sonra çağır
+
+      const urlParams = new URLSearchParams(window.location.search);
+      const reviewDataJson = sessionStorage.getItem('reviewData');
+
+      if (reviewDataJson) {
+        // --- İNCELEME MODU ---
+        sessionStorage.removeItem('reviewData');
+        const data = JSON.parse(reviewDataJson);
+        state.sonSonuc = data; 
+        olayDinleyicileriEkle(); // İnceleme için de dinleyiciler lazım
+        showIncelemeSayfasi(data);
+
+      } else if (urlParams.has('odevId') && urlParams.has('kategori') && urlParams.has('soruSayisi') && urlParams.has('startFrom')) {
+        // --- SINAV MODU ---
+        if (!ui.sonlandirBtn.dataset.listener) {
+            olayDinleyicileriEkle();
         }
-        
-        onAuthStateChanged(auth, async (user) => {
-            if (user) {
-                const docRef = doc(db, "kullanicilar", user.uid);
-                const docSnap = await getDoc(docRef);
-                state.currentUser = { uid: user.uid, email: user.email, ...(docSnap.exists() ? docSnap.data() : {}) };
-                
-                const urlParams = new URLSearchParams(window.location.search);
-                const reviewDataJson = sessionStorage.getItem('reviewData');
+        // kullaniciBilgileriniYukle(); // Zaten yukarıda çağrıldı
 
-                if (reviewDataJson) {
-                    // --- İNCELEME MODU ---
-                    sessionStorage.removeItem('reviewData');
-                    const data = JSON.parse(reviewDataJson);
-                    if(data.tarih) data.tarih = new Date(data.tarih).toLocaleString('tr-TR');
-                    state.sonSonuc = data;
-                    showIncelemeSayfasi(data);
-                
-                } else if (urlParams.has('odevId') && urlParams.has('kategori')) {
-                    // --- SINAV MODU ---
-                    resetState(); // state'i sıfırla ama currentUser'ı koru
-                    olayDinleyicileriEkle();
-                    kullaniciBilgileriniYukle();
-                    
-                    try {
-                        // sinaviBaslat artık async ve ödev detaylarını çekecek
-                        await sinaviBaslat(urlParams.get('kategori'), urlParams.get('odevId'));
-                    } catch (error) {
-                        console.error("Sınav başlatılamadı:", error);
-                        // YÖNLENDİRME DÜZELTİLDİ
-                        showBilgiPopup(`Hata: ${error.message}`, () => { window.location.href = 'program.html'; });
-                    }
-
-                } else {
-                    // --- GEÇERSİZ GİRİŞ ---
-                    document.body.innerHTML = `<div style="text-align:center; padding:50px;">
-                        <h1>Geçersiz Sınav</h1>
-                        <p>Bu sınava bir ödev bağlantısı üzerinden erişmelisiniz.</p>
-                        <a href="program.html">Ödevlerime Dön</a>
-                    </div>`;
-                }
-
-            } else {
-                window.location.href = 'index.html'; 
-            }
-        });
-        
-        function olayDinleyicileriEkle() {
-            // Olay dinleyicilerinin tekrar tekrar eklenmesini önle (basit bir kontrol)
-            if (ui.sonlandirBtn.dataset.listener) return;
-            
-            ui.sonlandirBtn.addEventListener('click', () => { showOnayPopup('Sınavı sonlandırmak istediğinize emin misiniz?', () => sinaviSonlandir(true)); });
-            ui.prevBtn.addEventListener('click', oncekiSoru);
-            ui.nextBtn.addEventListener('click', sonrakiSoru);
-            
-            ui.odevlereDonBtn.addEventListener('click', () => { window.location.href = 'program.html'; });
-            ui.devamEtBtn.addEventListener('click', () => { window.location.reload(); }); // Sayfayı yenile, yeni metni yüklesin
-            document.getElementById('sorulari-incele-btn').addEventListener('click', sorulariIncelemeyeBasla);
-            
-            document.getElementById('sonuclara-don-btn').addEventListener('click', () => { window.location.href = 'program.html'; });
-            
-            document.getElementById('prev-btn-inceleme').addEventListener('click', oncekiIncelemeSoru);
-            document.getElementById('next-btn-inceleme').addEventListener('click', sonrakiIncelemeSoru);
-            document.getElementById('print-btn-live').addEventListener('click', handleLivePrint);
-            document.getElementById('print-btn-inceleme').addEventListener('click', handleReviewPrint);
-
-            ui.paragrafPaneli.addEventListener('mouseup', handleTextHighlight);
-            ui.paragrafPaneli.addEventListener('click', handleHighlightRemoval);
-            ui.paragrafPaneli.addEventListener('copy', (e) => e.preventDefault());
-
-            ui.soruPaneli.addEventListener('click', handleOptionSelect);
-            ui.soruPaneli.addEventListener('contextmenu', handleOptionStrikethrough);
-
-            initResizer();
-
-            // Dinleyicilerin eklendiğini işaretle
-            ui.sonlandirBtn.dataset.listener = 'true';
+        try {
+          await sinaviBaslat(
+            urlParams.get('kategori'),
+            urlParams.get('odevId'),
+            parseInt(urlParams.get('soruSayisi'), 10), 
+            parseInt(urlParams.get('startFrom'), 10)  
+          );
+        } catch (err) {
+          console.error("Sınav başlatılamadı:", err);
+          showBilgiPopup(`Hata: ${err.message || 'Sınav yüklenemedi.'}`, () => { window.location.href = 'program.html'; });
         }
-        
-        async function sinaviBaslat(kategori, odevId) {
-            // 1. Ödev belgesini Firestore'dan çek
-            const odevRef = doc(db, "odevler", state.currentUser.uid, "gorevler", odevId);
-            const odevSnap = await getDoc(odevRef);
+      } else {
+        // --- GEÇERSİZ GİRİŞ ---
+        document.body.innerHTML = `
+          <div style="text-align:center; padding:50px;">
+            <h1>Geçersiz Sınav</h1>
+            <p>Bu sayfaya geçerli bir ödev bağlantısı üzerinden erişmelisiniz (kategori, odevId, soruSayisi, startFrom parametreleri eksik).</p>
+            <a href="program.html">Ödevlerime Dön</a>
+          </div>`;
+      }
+    });
 
-            if (!odevSnap.exists()) {
-                throw new Error("Atanmış ödev bulunamadı. Lütfen ödevler sayfanıza dönün.");
-            }
+    /* --- Olaylar --- */
+    function olayDinleyicileriEkle() {
+      if (ui.sonlandirBtn.dataset.listener) return;
 
-            const odevData = odevSnap.data();
-            const cozulenMetinler = odevData.cozulenMetinler || []; // Çözülmüş metinlerin ID listesi
-            const toplamMetinSayisi = odevData.soruSayisi; // Öğretmenin atadığı toplam metin sayısı
+      ui.sonlandirBtn.addEventListener('click', () => {
+        showOnayPopup('Bu metni sonlandırıp sonuçları görmek istediğinize emin misiniz?', () => sinaviSonlandir(true));
+      });
+      ui.prevBtn.addEventListener('click', oncekiSoru);
+      ui.nextBtn.addEventListener('click', sonrakiSoru);
 
-            // 2. Ödevin tamamlanıp tamamlanmadığını kontrol et
-            if (cozulenMetinler.length >= toplamMetinSayisi) {
-                throw new Error("Bu ödevi zaten tamamlamışsınız.");
-            }
+      ui.odevlereDonBtn.addEventListener('click', () => { window.location.href = 'program.html'; });
 
-            // 3. State'i ödev verisiyle güncelle
-            state.odevId = odevId;
-            state.sinavTuru = kategori;
-            state.toplamMetinSayisi = toplamMetinSayisi;
-            state.cozulenMetinSayisi = cozulenMetinler.length;
+      ui.devamEtBtn.addEventListener('click', async () => {
+          ui.devamEtBtn.disabled = true; 
+          ui.devamEtBtn.textContent = "Yükleniyor...";
+          try {
+              await sinaviBaslat(
+                  state.sinavTuru,
+                  state.odevId,
+                  state.buOdevIcinIstenenMetinSayisi,
+                  state.buOdevIcinBaslangicIndex 
+              );
+          } catch (e) {
+              console.error("Devam et hatası:", e);
+              showBilgiPopup("Sıradaki metin yüklenirken bir hata oluştu.", () => window.location.href = 'program.html');
+          } finally {
+              ui.devamEtBtn.disabled = false;
+              ui.devamEtBtn.textContent = "Devam Et (Sonraki Metin) →";
+          }
+      });
 
-            // 4. Çözülecek bir sonraki metni yükle
-            sorulariYukle(kategori, cozulenMetinler); // cozulenMetinler listesini gönder
-            
-            if(state.sorular.length === 0) return; // sorulariYukle hata verdiyse (örn: havuz boş)
+      document.getElementById('sorulari-incele-btn').addEventListener('click', sorulariIncelemeyeBasla);
+      document.getElementById('sonuclara-don-btn').addEventListener('click', () => { window.location.href = 'program.html'; });
 
-            // 5. Arayüzü ayarla
-            ui.sinavArayuzu.style.display = 'block';
-            ui.sonucArayuzu.style.display = 'none';
-            ui.incelemeArayuzu.style.display = 'none';
+      // İnceleme butonları
+      ui.prevBtnInceleme.addEventListener('click', oncekiIncelemeSoru);
+      ui.nextBtnInceleme.addEventListener('click', sonrakiIncelemeSoru);
+      
+      // Yazdırma butonları
+      document.getElementById('print-btn-live').addEventListener('click', handleLivePrint);
+      document.getElementById('print-btn-inceleme').addEventListener('click', handleReviewPrint);
 
-            // Başlığı güncelle (Örn: Haftalık Okuma (Metin 2 / 5))
-            const odevBaslik = odevData.baslik || 'Okuma Sınavı';
-            ui.sinavBaslik.textContent = `${odevBaslik} (Metin ${state.cozulenMetinSayisi + 1} / ${state.toplamMetinSayisi})`;
+      // Metin seçimi
+      ui.paragrafPaneli.addEventListener('mouseup', handleTextHighlight);
+      // DÜZELTME: "paragagrafPaneli" -> "paragrafPaneli" olarak düzeltildi.
+      ui.paragrafPaneli.addEventListener('click', handleHighlightRemoval); 
 
-            const ilkSoru = state.sorular[0];
-            ui.paragrafPaneli.innerHTML = `<h2>${ilkSoru.passageTitle}</h2><p>${ilkSoru.passage}</p>`;
-            
-            state.sinavAktif = true;
-            soruyuGuncelle(state.mevcutSoruIndex);
-            clearInterval(state.mainTimerInterval);
-            startMainExamTimer();
+      // Seçenek işaretleme / eleme
+      ui.soruPaneli.addEventListener('click', handleOptionSelect);
+      ui.soruPaneli.addEventListener('contextmenu', handleOptionStrikethrough);
+
+      // Panel yeniden boyutlandırma
+      initResizer();
+
+      ui.sonlandirBtn.dataset.listener = 'true';
+    }
+
+
+    /* --- Sınavı Başlat --- */
+    async function sinaviBaslat(kategori, odevId, soruSayisi, startFrom) {
+        console.log(`sinaviBaslat çağrıldı: kategori=${kategori}, odevId=${odevId}, soruSayisi=${soruSayisi}, startFrom=${startFrom}`);
+
+        resetState(true);
+
+        state.odevId = odevId;
+        state.sinavTuru = kategori;
+        state.buOdevIcinIstenenMetinSayisi = soruSayisi || 0;
+        state.buOdevIcinBaslangicIndex = startFrom || 0;
+
+        const odevRef = doc(db, "odevler", state.currentUser.uid, "gorevler", odevId);
+        const odevSnap = await getDoc(odevRef);
+        if (!odevSnap.exists()) {
+            throw new Error("Atanmış ödev bulunamadı. Lütfen ödevler sayfanıza dönün.");
         }
-        
-        function sorulariYukle(kategori, cozulenMetinler) {
-            // Eski localStorage mantığı KALDIRILDI.
-            const sinavTuru = kategori;
-            if (!sinavTuru || !SINAV_VERITABANI[sinavTuru]) {
-                showBilgiPopup(`Sınav türü ('${sinavTuru}') geçersiz.`, () => { window.location.href = 'program.html'; });
-                return;
-            }
-            
-            const tumParagraflar = SINAV_VERITABANI[sinavTuru];
-            if (tumParagraflar.length === 0) {
-                showBilgiPopup("Bu kategori için sisteme henüz metin eklenmemiş.", () => { window.location.href = 'program.html'; });
-                state.sorular = [];
-                return;
-            }
+        const odevData = odevSnap.data();
 
-            // 1. Havuzdan, 'cozulenMetinler' listesinde OLMAYAN ilk metni bul
-            const secilenMetin = tumParagraflar.find(p => !cozulenMetinler.includes(p.passageId));
+        const tumCozulenMetinlerListesi = Array.isArray(odevData.cozulenMetinler) ? odevData.cozulenMetinler : [];
+        console.log("Tüm çözülen metin ID'leri (tarihçe):", tumCozulenMetinlerListesi);
 
-            // 2. Eğer çözülmemiş metin kalmadıysa (havuz bittiyse)
-            if (!secilenMetin) {
-                 showBilgiPopup("Tebrikler! Bu kategorideki tüm metinleri tamamladınız. Lütfen öğretmeninize bildirin.", () => {
-                    window.location.href = 'program.html';
-                });
-                state.sorular = [];
-                return;
+        const buOdevdeCozulenSayisi = Math.max(0, tumCozulenMetinlerListesi.length - state.buOdevIcinBaslangicIndex);
+        if (buOdevdeCozulenSayisi >= state.buOdevIcinIstenenMetinSayisi) {
+            throw new Error(`Bu ödevdeki tüm (${state.buOdevIcinIstenenMetinSayisi}) metni zaten tamamlamış görünüyorsunuz.`);
+        }
+        state.buOdevIcinCozulenIndex = buOdevdeCozulenSayisi; 
+
+        const tumMevcutMetinler = SINAV_VERITABANI[kategori];
+        if (!Array.isArray(tumMevcutMetinler) || tumMevcutMetinler.length === 0) {
+            throw new Error(`'${kategori}' kategorisi için sisteme metin eklenmemiş.`);
+        }
+
+        const cozulebilecekMetinler = tumMevcutMetinler.filter(p => p && p.passageId && !tumCozulenMetinlerListesi.includes(p.passageId)); 
+        console.log(`Çözülebilecek ${cozulebilecekMetinler.length} metin bulundu.`);
+
+        const secilenMetin = cozulebilecekMetinler[0];
+        if (!secilenMetin) {
+            throw new Error("Tebrikler! Bu kategorideki tüm metinleri tamamladınız.");
+        }
+        console.log(`Sıradaki metin seçildi: ID=${secilenMetin.passageId}, Başlık=${secilenMetin.passageTitle}`);
+
+        if (!secilenMetin.passageId || typeof secilenMetin.passageTitle !== 'string' || typeof secilenMetin.passage !== 'string' || !Array.isArray(secilenMetin.questions) || secilenMetin.questions.length === 0) {
+            console.error("Seçilen metin verisi eksik veya hatalı:", secilenMetin);
+            throw new Error(`Sıradaki metin ('${secilenMetin.passageId || 'ID BİLİNMİYOR'}') yüklenirken bir yapı hatası oluştu. Lütfen durumu öğretmeninize bildirin.`);
+        }
+
+        state.currentPassageId = secilenMetin.passageId;
+        state.sorular = secilenMetin.questions.map((soru, idx) => {
+            if (!soru || typeof soru.metin !== 'string' || !Array.isArray(soru.secenekler) || typeof soru.dogruCevap !== 'string') {
+                console.warn(`Metin ${secilenMetin.passageId}, Soru ${idx+1} hatalı yapıya sahip olabilir.`);
             }
-
-            // 3. Bulunan metni ve ID'sini state'e kaydet
-            state.currentPassageId = secilenMetin.passageId; // Bu metni bitirince ödev belgesine işleyeceğiz
-            state.sorular = secilenMetin.questions.map((soru, index) => ({
-                id: index + 1,
+            return {
+                id: idx + 1, 
                 passageId: secilenMetin.passageId,
                 passageTitle: secilenMetin.passageTitle,
                 passage: secilenMetin.passage,
                 ...soru
-            }));
-        }
+            };
+        });
 
-        function soruyuGuncelle(index) {
-            const soru = state.sorular[index];
-            let seceneklerHtml = `<div class="question-number">Soru ${soru.id} / ${state.sorular.length}</div><div class="question-text">${soru.metin}</div><ul class="options-list">`;
-            soru.secenekler.forEach((secenek, i) => {
-                const secenekHarfi = String.fromCharCode(65 + i);
-                const isChecked = state.ogrenciCevaplari[soru.id] === secenekHarfi;
-                const isStruck = state.strikethroughs[`${soru.id}-${secenekHarfi}`];
-                seceneklerHtml += `<li data-soru-id="${soru.id}" data-secenek="${secenekHarfi}" class="${isChecked ? "selected" : ""} ${isStruck ? "strikethrough" : ""}">
-                    <span class="radio-custom"></span><label>${secenek}</label></li>`;
-            });
-            seceneklerHtml += "</ul>";
-            ui.soruPaneli.innerHTML = seceneklerHtml;
-            ui.prevBtn.disabled = index === 0;
-            ui.nextBtn.disabled = index === state.sorular.length - 1;
-        }
+        ui.sinavArayuzu.style.display = 'block';
+        ui.sonucArayuzu.style.display = 'none';
+        ui.incelemeArayuzu.style.display = 'none';
 
-        function handleOptionSelect(e) {
-            const li = e.target.closest('li');
-            if (!li) return;
-            const { soruId, secenek } = li.dataset;
-            state.ogrenciCevaplari[soruId] = secenek;
-            soruyuGuncelle(state.mevcutSoruIndex);
-        }
+        const odevBaslik = odevData.baslik || 'Okuma Sınavı';
+        const buOdevdekiSira = state.buOdevIcinCozulenIndex + 1;
+        ui.sinavBaslik.textContent = `${odevBaslik} (Metin ${buOdevdekiSira} / ${state.buOdevIcinIstenenMetinSayisi})`;
 
-        function handleOptionStrikethrough(e) {
-            e.preventDefault();
-            const li = e.target.closest('li');
-            if (!li) return;
-            const { soruId, secenek } = li.dataset;
-            const key = `${soruId}-${secenek}`;
-            state.strikethroughs[key] = !state.strikethroughs[key];
-            li.classList.toggle('strikethrough');
-        }
+        const escapedTitle = escapeHtml(secilenMetin.passageTitle);
+        const escapedPassage = escapeHtml(secilenMetin.passage); 
         
-        function handleTextHighlight() {
-            const selection = window.getSelection();
-            if (selection.rangeCount > 0 && !selection.isCollapsed) {
-                const range = selection.getRangeAt(0);
-                if (!ui.paragrafPaneli.contains(range.commonAncestorContainer)) return;
-                const span = document.createElement('span');
-                span.className = 'highlight';
-                try {
-                    range.surroundContents(span);
-                } catch (error) { console.error("Highlighting error:", error); }
-                selection.removeAllRanges();
-            }
-        }
+        // escapeHtml 'undefined' değil, '' döndüreceği için (aşağıda düzeltildi) .replace() hatası alınmaz.
+        const formattedPassage = escapedPassage.replace(/\n\n/g, '<br><br>').replace(/\n/g, ' '); 
+        ui.paragrafPaneli.innerHTML = `<h2>${escapedTitle}</h2><p>${formattedPassage}</p>`;
 
-        function handleHighlightRemoval(e) {
-            if (e.target.classList.contains('highlight')) {
-                const parent = e.target.parentNode;
-                while (e.target.firstChild) {
-                    parent.insertBefore(e.target.firstChild, e.target);
-                }
-                parent.removeChild(e.target);
+        // Önceki vurguları temizle
+        ui.paragrafPaneli.querySelectorAll('.highlight').forEach(el => {
+            const parent = el.parentNode;
+            if (parent) {
+                while (el.firstChild) parent.insertBefore(el.firstChild, el);
+                parent.removeChild(el);
                 parent.normalize();
             }
+        });
+
+        state.mevcutSoruIndex = 0;
+        state.ogrenciCevaplari = {};
+        state.strikethroughs = {};
+        state.sinavAktif = true;
+
+        soruyuGuncelle(state.mevcutSoruIndex);
+        clearInterval(state.mainTimerInterval);
+        state.kalanSureSaniye = SINAV_SURESI_DAKIKA * 60;
+        startMainExamTimer();
+    }
+
+    /* --- Soru Render --- */
+    function soruyuGuncelle(index){
+        const soru = state.sorular[index];
+        if (!soru) return; 
+
+        let seceneklerHtml = `
+          <div class="question-number">Soru ${soru.id} / ${state.sorular.length}</div>
+          <div class="question-text">${escapeHtml(soru.metin)}</div>
+          <ul class="options-list">`;
+
+        soru.secenekler.forEach((secenek, i) => {
+          const secenekHarfi = String.fromCharCode(65 + i);
+          const isChecked = state.ogrenciCevaplari[soru.id] === secenekHarfi;
+          const isStruck = state.strikethroughs[`${soru.id}-${secenekHarfi}`];
+          seceneklerHtml += `
+            <li data-soru-id="${soru.id}" data-secenek="${secenekHarfi}" class="${isChecked ? 'selected' : ''} ${isStruck ? 'strikethrough' : ''}">
+              <span class="radio-custom"></span>
+              <label>${escapeHtml(secenek)}</label>
+            </li>`;
+        });
+        seceneklerHtml += `</ul>`;
+
+        ui.soruPaneli.innerHTML = seceneklerHtml;
+        ui.prevBtn.disabled = index === 0;
+        ui.nextBtn.disabled = index === state.sorular.length - 1;
+    }
+
+    /* --- İşaretleme / Eleme --- */
+    function handleOptionSelect(e){
+        if (!state.sinavAktif) return;
+        const li = e.target.closest('li');
+        if (!li) return;
+        const { soruId, secenek } = li.dataset;
+        if (state.ogrenciCevaplari[soruId] === secenek) {
+            delete state.ogrenciCevaplari[soruId]; 
+        } else {
+            state.ogrenciCevaplari[soruId] = secenek;
         }
+        soruyuGuncelle(state.mevcutSoruIndex);
+    }
 
-        async function sinaviSonlandir(kullaniciIstegi) {
-            if (!state.sinavAktif) return;
-            state.sinavAktif = false;
-            clearInterval(state.mainTimerInterval);
-            document.querySelectorAll('#sinav-arayuzu button').forEach(el => el.disabled = true);
+    function handleOptionStrikethrough(e){
+        if (!state.sinavAktif) return;
+        e.preventDefault();
+        const li = e.target.closest('li');
+        if (!li) return;
+        const { soruId, secenek } = li.dataset;
+        const key = `${soruId}-${secenek}`;
+        state.strikethroughs[key] = !state.strikethroughs[key];
+        li.classList.toggle('strikethrough');
+    }
 
-            const sonuc = sonuclariHesapla();
-            state.sonSonuc = sonuc.local; // Bu metnin sonucunu inceleme için sakla
+    /* --- Metin Vurgulama (TAMAMLANDI) --- */
+    function handleTextHighlight() {
+        if (!state.sinavAktif) return;
+        const selection = window.getSelection();
+        if (!selection.rangeCount || selection.isCollapsed) return;
 
-            // sonucu sunucuya gönder VE ödevin tamamen bitip bitmediğini öğren
-            const hepsiBittiMi = await sonucuSunucuyaGonder(sonuc.firebase, state.odevId, sonuc.local);
+        const range = selection.getRangeAt(0);
+        const parentElement = range.commonAncestorContainer.parentElement;
+
+        // Sadece paragraf paneli içindeyse vurgula
+        if (!ui.paragrafPaneli.contains(parentElement)) return;
+
+        // Seçimin tamamı paragrafın içindeyse
+        if (ui.paragrafPaneli.contains(range.startContainer) && ui.paragrafPaneli.contains(range.endContainer)) {
+            // Seçili metin zaten bir highlight içindeyse işlem yapma
+            if (range.startContainer.parentElement.classList.contains('highlight') || 
+                range.endContainer.parentElement.classList.contains('highlight')) {
+                selection.removeAllRanges();
+                return;
+            }
+
+            const span = document.createElement('span');
+            span.className = 'highlight';
+            span.appendChild(range.extractContents());
+            range.insertNode(span);
+        }
+        selection.removeAllRanges();
+    }
+
+    function handleHighlightRemoval(e) {
+        if (e.target.classList.contains('highlight')) {
+            const highlightSpan = e.target;
+            const parent = highlightSpan.parentNode;
             
-            let mesaj = kullaniciIstegi ? "Bu metin başarıyla sonlandırıldı." : "Süreniz dolduğu için bu metin sonlandırıldı.";
-            showBilgiPopup(mesaj, () => startResultsCountdown(sonuc.local, hepsiBittiMi));
+            // Vurguyu kaldır
+            while (highlightSpan.firstChild) {
+                parent.insertBefore(highlightSpan.firstChild, highlightSpan);
+            }
+            parent.removeChild(highlightSpan);
+            parent.normalize(); // Bitişik text nodeları birleştir
         }
-        
-        function sonuclariHesapla() {
-            let dogru = 0, yanlis = 0, bos = 0;
-            const { isim, soyisim } = state.currentUser;
-            state.sorular.forEach(soru => {
-                const ogrenciCevabi = state.ogrenciCevaplari[soru.id];
-                if (!ogrenciCevabi) bos++;
-                else if (ogrenciCevabi === soru.dogruCevap) dogru++;
-                else yanlis++;
+    }
+
+    /* --- Navigasyon (TAMAMLANDI) --- */
+    function sonrakiSoru() {
+        if (state.mevcutSoruIndex < state.sorular.length - 1) {
+            state.mevcutSoruIndex++;
+            soruyuGuncelle(state.mevcutSoruIndex);
+        }
+    }
+    
+    function oncekiSoru() {
+        if (state.mevcutSoruIndex > 0) {
+            state.mevcutSoruIndex--;
+            soruyuGuncelle(state.mevcutSoruIndex);
+        }
+    }
+
+    /* --- Süre --- */
+    function startMainExamTimer() {
+        let saniye = state.kalanSureSaniye;
+        ui.mainTimer.style.color = saniye < 60 ? 'var(--danger-dark)' : 'var(--primary-color)'; 
+
+        clearInterval(state.mainTimerInterval); 
+
+        state.mainTimerInterval = setInterval(() => {
+            if (!state.sinavAktif) { 
+                clearInterval(state.mainTimerInterval);
+                return;
+            }
+
+            saniye--; 
+            state.kalanSureSaniye = saniye; 
+
+            if (saniye < 0) {
+                clearInterval(state.mainTimerInterval);
+                ui.mainTimer.textContent = "00:00";
+                sinaviSonlandir(false); 
+                return;
+            }
+
+            const dakika = Math.floor(saniye / 60);
+            const kalanSaniye = saniye % 60;
+            ui.mainTimer.textContent = [dakika, kalanSaniye].map(v => v < 10 ? '0' + v : v).join(':');
+
+            if (saniye < 60 && ui.mainTimer.style.color !== 'var(--danger-dark)') {
+                ui.mainTimer.style.color = 'var(--danger-dark)';
+            } else if (saniye >= 60 && ui.mainTimer.style.color !== 'var(--primary-color)') {
+                ui.mainTimer.style.color = 'var(--primary-color)';
+            }
+
+        }, 1000);
+    }
+
+
+    /* --- Sınavı Sonlandır --- */
+    async function sinaviSonlandir(kullaniciIstegi) {
+      if (!state.sinavAktif) return;
+      console.log("Sınav sonlandırılıyor...");
+
+      state.sinavAktif = false;
+      clearInterval(state.mainTimerInterval);
+      document.querySelectorAll('#sinav-arayuzu button, #sinav-arayuzu li').forEach(el => el.style.pointerEvents = 'none');
+      ui.sonlandirBtn.disabled = true;
+      ui.prevBtn.disabled = true;
+      ui.nextBtn.disabled = true;
+
+      const buMetninSonucu = sonuclariHesapla(); 
+      state.sonSonuc = buMetninSonucu.local; 
+
+      let buOdevTamamlandiMi = false;
+      try {
+          buOdevTamamlandiMi = await sonucuSunucuyaGonder(buMetninSonucu.firebase, state.odevId, state.sonSonuc);
+          console.log("Sonuç sunucuya gönderildi. Bu ödev tamamlandı mı:", buOdevTamamlandiMi);
+      } catch (error) {
+          console.error("Sonuç gönderilirken/Ödev güncellenirken hata:", error);
+          showBilgiPopup("Sonuçlar kaydedilirken bir hata oluştu. Lütfen durumu öğretmeninize bildirin.", () => startResultsCountdown(state.sonSonuc, true)); 
+          return; 
+      }
+
+      const mesaj = kullaniciIstegi ? "Bu metin başarıyla sonlandırıldı." : "Süreniz dolduğu için bu metin sonlandırıldı.";
+      showBilgiPopup(mesaj, () => startResultsCountdown(state.sonSonuc, buOdevTamamlandiMi));
+    }
+
+    /* --- Sonucları Hesapla --- */
+    function sonuclariHesapla() {
+      let dogru = 0, yanlis = 0, bos = 0;
+      const { isim, soyisim } = state.currentUser || {}; 
+
+      state.sorular.forEach(soru => {
+        const ogrenciCevabi = state.ogrenciCevaplari[soru.id];
+        if (ogrenciCevabi === undefined || ogrenciCevabi === null || ogrenciCevabi === '') {
+          bos++;
+        } else if (ogrenciCevabi === soru.dogruCevap) {
+          dogru++;
+        } else {
+          yanlis++;
+        }
+      });
+
+      const net = dogru - (yanlis / 4);
+
+      const sonucData = {
+        isim: isim || '', soyisim: soyisim || '', sinavTuru: state.sinavTuru || 'Bilinmiyor',
+        dogruSayisi: dogru, yanlisSayisi: yanlis, bosSayisi: bos,
+        netSayisi: parseFloat(net.toFixed(2)),
+        sorular: state.sorular.map(q => ({ 
+            id: q.id,
+            metin: q.metin,
+            secenekler: q.secenekler,
+            dogruCevap: q.dogruCevap,
+            passageTitle: q.passageTitle, 
+            passage: q.passage 
+        })),
+        ogrenciCevaplari: { ...state.ogrenciCevaplari }, 
+        passageId: state.currentPassageId 
+      };
+
+      const firebaseKayitData = {
+        ...sonucData,
+        odevId: state.odevId || null, 
+        tarih: serverTimestamp() 
+      };
+      
+      const localGosterimData = {
+        ...sonucData,
+        tarih: new Date().toLocaleString('tr-TR')
+      };
+
+      return {
+        firebase: firebaseKayitData,
+        local: localGosterimData
+      };
+    }
+
+
+    /* --- Sonucu Sunucuya Gönder --- */
+    async function sonucuSunucuyaGonder(sonucFirebase, odevId, localSonuc) {
+        if (!state.currentUser || !odevId || !state.currentPassageId) {
+            console.error("Kullanıcı, ödev ID veya metin ID eksik, sonuç gönderilemiyor.");
+            throw new Error("Kullanıcı bilgileri veya ödev detayı eksik."); 
+        }
+
+        try {
+            const userExamsCol = collection(db, "kullanicilar", state.currentUser.uid, "sinavlar");
+            await addDoc(userExamsCol, sonucFirebase); 
+            console.log(`Metin sonucu (${state.currentPassageId}) 'sinavlar' koleksiyonuna kaydedildi.`);
+        } catch (e) {
+            console.error("'sinavlar' koleksiyonuna yazılamadı:", e);
+        }
+
+        try {
+            const odevRef = doc(db, "odevler", state.currentUser.uid, "gorevler", odevId);
+
+            await updateDoc(odevRef, {
+                cozulenMetinler: arrayUnion(state.currentPassageId)
             });
-            const net = (dogru - (yanlis / 4));
-            const sinavTuru = state.sinavTuru || 'Bilinmiyor';
-            
-            // Sadece bu metnin sonuçları
-            const sonucData = { 
-                isim, soyisim, sinavTuru, 
-                dogruSayisi: dogru, yanlisSayisi: yanlis, bosSayisi: bos, 
-                netSayisi: parseFloat(net.toFixed(2)), 
-                sorular: state.sorular, // Bu metnin soruları
-                ogrenciCevaplari: state.ogrenciCevaplari,
-                odevId: state.odevId || null,
-                passageId: state.currentPassageId // Hangi metnin çözüldüğü
-            };
-            
-            return { 
-                firebase: { ...sonucData, tarih: serverTimestamp() }, 
-                local: { ...sonucData, tarih: new Date().toLocaleString('tr-TR') } 
-            };
-        }
-        
-        async function sonucuSunucuyaGonder(sonuc, odevId, localSonuc) {
-            if (!state.currentUser) return false;
-            
-            // 1. Bu tekil metin sonucunu 'sinavlar' koleksiyonuna kaydet (detaylı analiz için)
-            try {
-                const userExamsCollectionRef = collection(db, "kullanicilar", state.currentUser.uid, "sinavlar");
-                await addDoc(userExamsCollectionRef, sonuc);
-                console.log("Metin detayı 'sinavlar' koleksiyonuna kaydedildi.");
-            } catch (e) { 
-                console.error("Firebase'e (sinavlar) yazılırken hata: ", e); 
+            console.log(`Metin ID (${state.currentPassageId}) ödev belgesine eklendi/güncellendi.`);
+
+            const updatedOdevSnap = await getDoc(odevRef);
+            if (!updatedOdevSnap.exists()) {
+                console.error("Ödev belgesi güncellendikten sonra bulunamadı!");
+                return false; 
             }
+            const updatedOdevData = updatedOdevSnap.data();
+            const guncelCozulenler = updatedOdevData.cozulenMetinler || [];
 
-            // 2. Ana ÖDEV belgesini GÜNCELLE
-            if (odevId) {
-                try {
-                    const odevRef = doc(db, "odevler", state.currentUser.uid, "gorevler", odevId);
-                    const odevSnap = await getDoc(odevRef);
-                    const odevData = odevSnap.data() || {};
+            const buOdevIcinGerekenToplam = state.buOdevIcinIstenenMetinSayisi;
+            const buOdevdeCozulenSayisi = Math.max(0, guncelCozulenler.length - state.buOdevIcinBaslangicIndex);
+            const buOdevTamamlandiMi = buOdevdeCozulenSayisi >= buOdevIcinGerekenToplam;
 
-                    // Önceki toplam sonuçları al
-                    const oncekiSonuc = odevData.sonuc || {};
-                    const yeniToplamDogru = (oncekiSonuc.dogruSayisi || 0) + localSonuc.dogruSayisi;
-                    const yeniToplamYanlis = (oncekiSonuc.yanlisSayisi || 0) + localSonuc.yanlisSayisi;
-                    const yeniToplamBos = (oncekiSonuc.bosSayisi || 0) + localSonuc.bosSayisi;
-                    const yeniNet = yeniToplamDogru - (yeniToplamYanlis / 4);
+            console.log(`Güncel çözülenler: ${guncelCozulenler.length}, Başlangıç: ${state.buOdevIcinBaslangicIndex}, Gereken: ${buOdevIcinGerekenToplam}, Bu ödevde çözülen: ${buOdevdeCozulenSayisi}, Tamamlandı mı: ${buOdevTamamlandiMi}`);
 
-                    // Çözülen metinler listesini güncelle
-                    const cozulenMetinler = odevData.cozulenMetinler || [];
-                    const yeniCozulenMetinler = [...cozulenMetinler, state.currentPassageId];
-                    
-                    const hepsiBittiMi = yeniCozulenMetinler.length >= state.toplamMetinSayisi;
-
-                    await updateDoc(odevRef, {
-                        // Ödev bittiyse "tamamlandi", bitmediyse "atanmis" olarak kalır
-                        durum: hepsiBittiMi ? "tamamlandi" : "atanmis",
-                        tamamlanmaTarihi: hepsiBittiMi ? serverTimestamp() : null,
-                        
-                        // Çözülen metin ID'sini listeye ekle
-                        cozulenMetinler: yeniCozulenMetinler, 
-                        
-                        // Toplam skoru güncelle
-                        sonuc: {
-                            dogruSayisi: yeniToplamDogru,
-                            yanlisSayisi: yeniToplamYanlis,
-                            bosSayisi: yeniToplamBos,
-                            netSayisi: parseFloat(yeniNet.toFixed(2))
-                        }
-                    });
-                    console.log("Ödev belgesi 'odevler' koleksiyonunda güncellendi.");
-                    return hepsiBittiMi; // Ödevin bitip bitmediğini döndür
-
-                } catch (e) { 
-                    console.error("Firebase (odev) güncellenirken hata: ", e); 
-                }
-            } else {
-                console.warn("OdevId bulunamadı, ödev belgesi güncellenemedi.");
-            }
-            return false; // Hata veya odevId yoksa
-        }
-
-        function startResultsCountdown(sonuc, hepsiBittiMi) {
-            const popup = document.getElementById('sayac-popup');
-            popup.classList.add('show');
-            let sayac = 5;
-            const sayacElementi = document.getElementById('gerisayim-sayaci');
-            sayacElementi.textContent = sayac;
-            const interval = setInterval(() => {
-                sayac--;
-                sayacElementi.textContent = sayac;
-                if (sayac <= 0) {
-                    clearInterval(interval);
-                    popup.classList.remove('show');
-                    showSonucSayfasi(sonuc, hepsiBittiMi);
-                }
-            }, 1000);
-        }
-
-        function showSonucSayfasi(sonuc, hepsiBittiMi) {
-            ui.sinavArayuzu.style.display = 'none';
-            ui.incelemeArayuzu.style.display = 'none';
-            ui.sonucArayuzu.style.display = 'block';
-            document.querySelectorAll('#sinav-arayuzu button').forEach(el => el.disabled = false);
-
-            document.getElementById('sonuc-kullanici-ad-soyad').textContent = `${sonuc.isim} ${sonuc.soyisim}`;
-            document.getElementById('dogru-sayisi').textContent = sonuc.dogruSayisi;
-            document.getElementById('yanlis-sayisi').textContent = sonuc.yanlisSayisi;
-            document.getElementById('bos-sayisi').textContent = sonuc.bosSayisi;
-            document.getElementById('net-sayisi').textContent = sonuc.netSayisi.toFixed(2);
-            
-            // "Devam Et" butonunu kontrol et
-            if (hepsiBittiMi) {
-                ui.devamEtBtn.style.display = 'none';
-            } else {
-                ui.devamEtBtn.style.display = 'block';
-            }
-
-            sonucOptikFormuCiz(sonuc);
-        }
-
-        function sonucOptikFormuCiz(sonuc) {
-            const container = document.getElementById('optik-form-sonuc');
-            let html = '';
-            
-            sonuc.sorular.forEach(soru => {
-                const ogrenciCevabi = sonuc.ogrenciCevaplari[soru.id];
-                const dogruCevap = soru.dogruCevap;
-                let durumText = '', durumClass = '';
-                if (!ogrenciCevabi) { durumText = 'BOŞ'; durumClass = 'durum-bos'; }
-                else if (ogrenciCevabi === dogruCevap) { durumText = 'DOĞRU'; durumClass = 'durum-dogru'; }
-                else { durumText = 'YANLIŞ'; durumClass = 'durum-yanlis'; }
-                
-                html += `<div class="cevap-anahtari-satir"><div class="cevap-soru-no">${soru.id}. Soru</div><div class="cevap-secenekler">`;
-                
-                soru.secenekler.forEach((_, i) => {
-                    const secenekHarfi = String.fromCharCode(65 + i);
-                    const secenekEtiketi = secenekHarfi;
-                    let siniflar = 'cevap-secenek';
-                    if (secenekHarfi === dogruCevap) siniflar += ' dogru-cevap';
-                    if (secenekHarfi === ogrenciCevabi) {
-                        siniflar += ' ogrenci-cevabi';
-                        if (ogrenciCevabi !== dogruCevap) siniflar += ' yanlis-cevap';
+            if (buOdevTamamlandiMi) {
+                 await updateDoc(odevRef, {
+                    durum: "tamamlandi",
+                    tamamlanmaTarihi: serverTimestamp(),
+                    // TODO: Burası ödevin genel sonucunu hesaplamak için daha gelişmiş bir mantık gerektirebilir
+                    // Şimdilik sadece son metnin sonucunu yazıyoruz, bu hatalı olabilir.
+                     sonuc: { 
+                        dogruSayisi: localSonuc.dogruSayisi,
+                        yanlisSayisi: localSonuc.yanlisSayisi,
+                        bosSayisi: localSonuc.bosSayisi,
+                        netSayisi: localSonuc.netSayisi
                     }
-                    html += `<div class="${siniflar}">${secenekEtiketi}</div>`;
                 });
-                html += `</div><div class="cevap-durum ${durumClass}">${durumText}</div></div>`;
-            });
-            container.innerHTML = html;
-        }
-
-        function showIncelemeSayfasi(data) {
-            state.mevcutIncelemeIndex = 0;
-            olayDinleyicileriEkle();
-            kullaniciBilgileriniYukle(); 
-            ui.sinavArayuzu.style.display = 'none';
-            ui.sonucArayuzu.style.display = 'none';
-            ui.incelemeArayuzu.style.display = 'block';
-            incelemeSorusunuCiz(state.mevcutIncelemeIndex);
-        }
-
-        function sorulariIncelemeyeBasla() {
-            if (!state.sonSonuc) {
-                alert("İncelenecek sonuç bulunamadı.");
-                return;
+                console.log(`Ödev (${odevId}) tamamlandı olarak işaretlendi.`);
+                return true; 
+            } else {
+                return false; 
             }
-            state.mevcutIncelemeIndex = 0;
-            ui.sonucArayuzu.style.display = 'none';
-            ui.incelemeArayuzu.style.display = 'block';
-            incelemeSorusunuCiz(state.mevcutIncelemeIndex);
+
+        } catch (e) {
+            console.error(`Ödev (${odevId}) güncellenirken kritik hata:`, e);
+            throw new Error("Ödev durumu güncellenemedi."); 
         }
+    }
+
+    /* --- Sonuç Görüntüleme --- */
+    function startResultsCountdown(sonuc, buOdevTamamlandiMi) {
+        const popup = document.getElementById('sayac-popup');
+        if (!popup) { 
+            showSonucSayfasi(sonuc, buOdevTamamlandiMi);
+            return;
+        }
+        popup.classList.add('show');
+        let sayac = 3; 
+        const sayacEl = document.getElementById('gerisayim-sayaci');
+        sayacEl.textContent = sayac;
+        const interval = setInterval(() => {
+            sayac--;
+            sayacEl.textContent = sayac;
+            if (sayac <= 0) {
+                clearInterval(interval);
+                popup.classList.remove('show');
+                showSonucSayfasi(sonuc, buOdevTamamlandiMi); 
+            }
+        }, 1000);
+    }
+
+    function showSonucSayfasi(sonuc, buOdevTamamlandiMi) {
+        ui.sinavArayuzu.style.display = 'none';
+        ui.incelemeArayuzu.style.display = 'none';
+        ui.sonucArayuzu.style.display = 'block';
+        document.querySelectorAll('#sonuc-arayuzu button').forEach(el => el.disabled = false);
+
+        document.getElementById('sonuc-kullanici-ad-soyad').textContent = `${sonuc.isim || ''} ${sonuc.soyisim || ''}`;
+        document.getElementById('dogru-sayisi').textContent = sonuc.dogruSayisi;
+        document.getElementById('yanlis-sayisi').textContent = sonuc.yanlisSayisi;
+        document.getElementById('bos-sayisi').textContent = sonuc.bosSayisi;
+        document.getElementById('net-sayisi').textContent = sonuc.netSayisi.toFixed(2);
+
+        if (buOdevTamamlandiMi) {
+            ui.devamEtBtn.style.display = 'none';
+            console.log("Ödev tamamlandı, Devam Et butonu gizlendi.");
+        } else {
+            ui.devamEtBtn.style.display = 'block';
+            console.log("Ödev devam ediyor, Devam Et butonu gösterildi.");
+        }
+
+        sonucOptikFormuCiz(sonuc); 
+    }
+
+
+    function sonucOptikFormuCiz(sonuc) {
+        const optikForm = document.getElementById('optik-form-sonuc');
+        if (!optikForm) return;
         
-        function incelemeSorusunuCiz(index) {
-            if (!state.sonSonuc || !state.sonSonuc.sorular) {
-                console.error("İncelenecek sonuç verisi bulunamadı.");
-                return;
-            }
-            const soru = state.sonSonuc.sorular[index];
-            const ogrenciCevabi = state.sonSonuc.ogrenciCevaplari[soru.id];
+        let html = '';
+        const secenekler = ['A', 'B', 'C', 'D', 'E']; // 5 seçenekli olduğunu varsayıyoruz
+
+        sonuc.sorular.forEach(soru => {
+            const ogrenciCevabi = sonuc.ogrenciCevaplari[soru.id];
             const dogruCevap = soru.dogruCevap;
+            let durum = '';
+            let durumClass = '';
 
-            document.getElementById('paragraf-paneli-inceleme').innerHTML = `<h2>${soru.passageTitle}</h2><p>${soru.passage}</p>`;
-            
-            let seceneklerHtml = `<div class="question-number">Soru ${soru.id}</div><div class="question-text">${soru.metin}</div><ul class="options-list review-mode">`;
-            soru.secenekler.forEach((secenek, i) => {
-                const secenekHarfi = String.fromCharCode(65 + i);
-                let siniflar = '';
-                if (secenekHarfi === dogruCevap) siniflar += ' review-correct';
-                if (secenekHarfi === ogrenciCevabi) {
-                    siniflar += ' review-student-choice';
-                    if (ogrenciCevabi !== dogruCevap) siniflar += ' review-incorrect';
-                }
-                seceneklerHtml += `<li class="${siniflar.trim()}"><span class="radio-custom"></span><label>${secenek}</label></li>`;
-            });
-            seceneklerHtml += "</ul>";
-            document.getElementById('soru-paneli-inceleme').innerHTML = seceneklerHtml;
-
-            document.getElementById('prev-btn-inceleme').disabled = index === 0;
-            document.getElementById('next-btn-inceleme').disabled = index === state.sonSonuc.sorular.length - 1;
-        }
-
-        function sonrakiIncelemeSoru() { if (state.sonSonuc && state.mevcutIncelemeIndex < state.sonSonuc.sorular.length - 1) { state.mevcutIncelemeIndex++; incelemeSorusunuCiz(state.mevcutIncelemeIndex); } }
-        function oncekiIncelemeSoru() { if (state.sonSonuc && state.mevcutIncelemeIndex > 0) { state.mevcutIncelemeIndex--; incelemeSorusunuCiz(state.mevcutIncelemeIndex); } }
-        
-        // --- Yazdırma Fonksiyonları (Değişiklik yok) ---
-        function handleLivePrint() {
-            const { isim, soyisim } = state.currentUser;
-            const passageTitle = state.sorular[0].passageTitle;
-            const passage = state.sorular[0].passage;
-            const questionsHtml = state.sorular.map((soru, index) => {
-                const optionsHtml = soru.secenekler.map((optionText, i) => {
-                    const optionLetter = String.fromCharCode(65 + i);
-                    return `<li><b>${optionLetter})</b> ${optionText}</li>`;
-                }).join('');
-                return `<div class="question-item"><div class="q-text"><b>${index + 1}.</b> ${soru.metin}</div><ul class="q-options-list">${optionsHtml}</ul></div>`;
-            }).join('');
-            printContent(isim, soyisim, passageTitle, passage, questionsHtml);
-        }
-        function handleReviewPrint() {
-            const sonuc = state.sonSonuc; if (!sonuc) return;
-            const passageTitle = sonuc.sorular[0].passageTitle;
-            const passage = sonuc.sorular[0].passage;
-            const questionsHtml = sonuc.sorular.map((soru, index) => {
-                const ogrenciCevabi = sonuc.ogrenciCevaplari[soru.id];
-                const dogruCevap = soru.dogruCevap;
-                const optionsHtml = soru.secenekler.map((optionText, i) => {
-                    const optionLetter = String.fromCharCode(65 + i);
-                    let styles = '';
-                    if (optionLetter === dogruCevap) styles += 'font-weight: bold; color: green;';
-                    if (optionLetter === ogrenciCevabi && ogrenciCevabi !== dogruCevap) styles += 'text-decoration: line-through; color: red;';
-                    return `<li style="${styles}"><b>${optionLetter})</b> ${optionText}</li>`;
-                }).join('');
-                return `<div class="question-item"><div class="q-text"><b>${index + 1}.</b> ${soru.metin}</div><ul class="q-options-list">${optionsHtml}</ul></div>`;
-            }).join('');
-            printContent(sonuc.isim, sonuc.soyisim, passageTitle, passage, questionsHtml, sonuc);
-        }
-        function printContent(isim, soyisim, passageTitle, passage, questionsHtml, sonuc = null) {
-            const examDate = sonuc ? sonuc.tarih : new Date().toLocaleString('tr-TR');
-            let summaryHtml = '';
-            if (sonuc) {
-                summaryHtml = `
-                    <div class="summary">
-                        <span><strong>Doğru:</strong> ${sonuc.dogruSayisi}</span>
-                        <span><strong>Yanlış:</strong> ${sonuc.yanlisSayisi}</span>
-                        <span><strong>Boş:</strong> ${sonuc.bosSayisi}</span>
-                        <span><strong>Net:</strong> ${sonuc.netSayisi.toFixed(2)}</span>
-                    </div>`;
+            if (ogrenciCevabi === undefined || ogrenciCevabi === null) {
+                durum = 'BOŞ';
+                durumClass = 'durum-bos';
+            } else if (ogrenciCevabi === dogruCevap) {
+                durum = 'DOĞRU';
+                durumClass = 'durum-dogru';
+            } else {
+                durum = 'YANLIŞ';
+                durumClass = 'durum-yanlis';
             }
-            const printHtml = `
-                <html><head><title>Sınav - ${isim} ${soyisim}</title>
-                <style>
-                    body { font-family: 'Times New Roman', Times, serif; font-size: 12pt; }
-                    .header { text-align: center; border-bottom: 2px solid #000; padding-bottom: 10px; margin-bottom: 20px; }
-                    .summary { display: flex; justify-content: space-around; margin-bottom: 20px; padding: 10px; border: 1px solid #ccc; }
-                    .passage { page-break-after: always; margin-bottom: 20px; background: #f9f9f9; padding: 15px; border: 1px solid #eee; }
-                    .question-item { page-break-inside: avoid; margin-bottom: 1rem; }
-                    .q-options-list { list-style-type: none; padding-left: 0; }
-                </style>
-                </head><body>
-                    <div class="header">
-                        <h2>${passageTitle}</h2>
-                        <p><strong>Öğrenci:</strong> ${isim} ${soyisim} | <strong>Tarih:</strong> ${examDate}</p>
-                    </div>
-                    ${summaryHtml}
-                    <div class="passage"><h3>Okuma Metni</h3><p>${passage.replace(/\n/g, '<br>')}</p></div>
-                    ${questionsHtml}
-                </body></html>`;
-            const printWindow = window.open('', '_blank');
-            printWindow.document.write(printHtml);
-            printWindow.document.close();
-            setTimeout(() => { printWindow.print(); printWindow.close(); }, 500);
-        }
-        
-        // --- Popup Fonksiyonları (Değişiklik yok) ---
-        function showOnayPopup(mesaj, callback) {
-            const popup = document.getElementById('onay-popup');
-            popup.querySelector('#onay-mesaji').innerHTML = mesaj;
-            popup.classList.add('show');
-            const iptalBtn = popup.querySelector('#onay-iptal-btn');
-            const devamBtn = popup.querySelector('#onay-devam-btn');
-            const devamListener = () => { popup.classList.remove('show'); callback(); cleanup(); };
-            const iptalListener = () => { popup.classList.remove('show'); cleanup(); };
-            const cleanup = () => {
-                devamBtn.removeEventListener('click', devamListener);
-                iptalBtn.removeEventListener('click', iptalListener);
-            };
-            devamBtn.addEventListener('click', devamListener, { once: true });
-            iptalBtn.addEventListener('click', iptalListener, { once: true });
-        }
-        function showBilgiPopup(mesaj, callback) {
-            const popup = document.getElementById('bilgi-popup');
-            popup.querySelector('#bilgi-mesaji').innerHTML = mesaj;
-            popup.classList.add('show');
-            const kapatBtn = popup.querySelector('#bilgi-kapat-btn');
-            kapatBtn.onclick = () => { popup.classList.remove('show'); if(callback) callback(); };
-        }
 
-        // --- Navigasyon ve Diğer Fonksiyonlar (Değişiklik yok) ---
-        function sonrakiSoru() { if (state.mevcutSoruIndex < state.sorular.length - 1) { state.mevcutSoruIndex++; soruyuGuncelle(state.mevcutSoruIndex); } }
-        function oncekiSoru() { if (state.mevcutSoruIndex > 0) { state.mevcutSoruIndex--; soruyuGuncelle(state.mevcutSoruIndex); } }
-        
-        function kullaniciBilgileriniYukle() {
-            if (!state.currentUser) return;
-            const { isim, soyisim } = state.currentUser;
-            const fullName = `${isim || 'Misafir'} ${soyisim || 'Aday'}`;
-            ui.kullaniciAdSoyad.forEach(el => el.textContent = fullName);
-            const incelemeAdElement = document.querySelector('.kullanici-ad-soyad-inceleme');
-            if (incelemeAdElement) incelemeAdElement.textContent = fullName;
-        }
-        
-        function startMainExamTimer() {
-            let saniye = SINAV_SURESI_DAKIKA * 60;
-            state.mainTimerInterval = setInterval(() => {
-                if (saniye < 0) {
-                    clearInterval(state.mainTimerInterval);
-                    sinaviSonlandir(false);
-                    return;
+            html += `<div class="cevap-anahtari-satir">`;
+            html += `<div class="cevap-soru-no">Soru ${soru.id}</div>`;
+            html += `<div class="cevap-secenekler">`;
+
+            secenekler.forEach(sec => {
+                let classes = 'cevap-secenek';
+                if (sec === dogruCevap) classes += ' dogru-cevap';
+                if (sec === ogrenciCevabi) {
+                    classes += (sec === dogruCevap) ? ' ogrenci-cevabi' : ' ogrenci-cevabi yanlis-cevap';
                 }
-                const dakika = Math.floor(saniye / 60);
-                const kalanSaniye = saniye % 60;
-                ui.mainTimer.textContent = [dakika, kalanSaniye].map(v => v < 10 ? '0' + v : v).join(':');
-                if (saniye < 60) { ui.mainTimer.style.color = '#c9302c'; }
-                saniye--;
-            }, 1000);
+                html += `<div class="${classes}">${sec}</div>`;
+            });
+
+            html += `</div>`; // .cevap-secenekler
+            html += `<div class="cevap-durum ${durumClass}">${durum}</div>`;
+            html += `</div>`; // .cevap-anahtari-satir
+        });
+
+        optikForm.innerHTML = html;
+    }
+
+    /* --- İnceleme Ekranı (TAMAMLANDI) --- */
+    function showIncelemeSayfasi(data) {
+        if (!data) return;
+        
+        state.sonSonuc = data; // İnceleme verisini state'e kaydet (navigasyon için)
+        state.mevcutIncelemeIndex = 0;
+
+        ui.sinavArayuzu.style.display = 'none';
+        ui.sonucArayuzu.style.display = 'none';
+        ui.incelemeArayuzu.style.display = 'block';
+
+        // Kullanıcı adını inceleme ekranına da bas
+        const adSoyad = `${data.isim || ''} ${data.soyisim || ''}`;
+        ui.kullaniciAdSoyadInceleme.forEach(el => el.textContent = adSoyad);
+        
+        // Paragrafı inceleme paneline yükle
+        // Sadece ilk sorunun metnini alsak yeterli, hepsi aynı
+        if (data.sorular && data.sorular.length > 0) {
+            const ilkSoru = data.sorular[0];
+            const escapedTitle = escapeHtml(ilkSoru.passageTitle);
+            const escapedPassage = escapeHtml(ilkSoru.passage);
+            const formattedPassage = escapedPassage.replace(/\n\n/g, '<br><br>').replace(/\n/g, ' ');
+            ui.paragrafPaneliInceleme.innerHTML = `<h2>${escapedTitle}</h2><p>${formattedPassage}</p>`;
+        }
+        
+        incelemeSorusunuCiz(state.mevcutIncelemeIndex);
+    }
+
+    function sorulariIncelemeyeBasla() {
+        if (!state.sonSonuc) {
+            showBilgiPopup("İncelenecek sonuç verisi bulunamadı.");
+            return;
+        }
+        showIncelemeSayfasi(state.sonSonuc);
+    }
+
+    function incelemeSorusunuCiz(index) {
+        if (!state.sonSonuc || !state.sonSonuc.sorular) return;
+
+        const soru = state.sonSonuc.sorular[index];
+        if (!soru) return;
+
+        const ogrenciCevabi = state.sonSonuc.ogrenciCevaplari[soru.id];
+        const dogruCevap = soru.dogruCevap;
+
+        let seceneklerHtml = `
+          <div class="question-number">Soru ${soru.id} / ${state.sonSonuc.sorular.length}</div>
+          <div class="question-text">${escapeHtml(soru.metin)}</div>
+          <ul class="options-list review-mode">`; // review-mode class'ı eklendi
+
+        soru.secenekler.forEach((secenek, i) => {
+            const secenekHarfi = String.fromCharCode(65 + i);
+            let liClass = '';
+
+            if (secenekHarfi === dogruCevap) {
+                liClass = 'review-correct';
+            }
+            if (secenekHarfi === ogrenciCevabi) {
+                liClass += (ogrenciCevabi === dogruCevap) ? ' review-student-choice' : ' review-incorrect review-student-choice';
+            }
+            
+            seceneklerHtml += `
+              <li class="${liClass}" data-secenek="${secenekHarfi}">
+                <span class="radio-custom"></span>
+                <label>${escapeHtml(secenek)}</label>
+              </li>`;
+        });
+        seceneklerHtml += `</ul>`;
+
+        ui.soruPaneliInceleme.innerHTML = seceneklerHtml;
+        ui.prevBtnInceleme.disabled = index === 0;
+        ui.nextBtnInceleme.disabled = index === state.sonSonuc.sorular.length - 1;
+    }
+
+    function sonrakiIncelemeSoru() {
+        if (state.mevcutIncelemeIndex < state.sonSonuc.sorular.length - 1) {
+            state.mevcutIncelemeIndex++;
+            incelemeSorusunuCiz(state.mevcutIncelemeIndex);
+        }
+    }
+
+    function oncekiIncelemeSoru() {
+        if (state.mevcutIncelemeIndex > 0) {
+            state.mevcutIncelemeIndex--;
+            incelemeSorusunuCiz(state.mevcutIncelemeIndex);
+        }
+    }
+
+    /* --- Yazdırma (TAMAMLANDI) --- */
+    function handleLivePrint() {
+        if (!state.currentUser || !state.sorular || state.sorular.length === 0) {
+            showBilgiPopup("Yazdırılacak içerik bulunamadı.");
+            return;
+        }
+        const { isim, soyisim } = state.currentUser;
+        const { passageTitle, passage } = state.sorular[0]; // Hepsi aynı metne ait
+        
+        let questionsHtml = '';
+        state.sorular.forEach(soru => {
+            questionsHtml += `<div classclass="print-question-item">`;
+            questionsHtml += `<p class="print-q-text"><strong>Soru ${soru.id}:</strong> ${escapeHtml(soru.metin)}</p>`;
+            questionsHtml += `<ul class="print-q-options">`;
+            soru.secenekler.forEach((sec, i) => {
+                const harf = String.fromCharCode(65 + i);
+                questionsHtml += `<li><strong>${harf})</strong> ${escapeHtml(sec)}</li>`;
+            });
+            questionsHtml += `</ul></div>`;
+        });
+
+        printContent(isim, soyisim, passageTitle, passage, questionsHtml, null);
+    }
+
+    function handleReviewPrint() {
+        if (!state.sonSonuc) {
+            showBilgiPopup("Yazdırılacak sonuç verisi bulunamadı.");
+            return;
+        }
+        const { isim, soyisim, sorular, ogrenciCevaplari } = state.sonSonuc;
+        const { passageTitle, passage } = sorular[0]; 
+        
+        let questionsHtml = '';
+        sorular.forEach(soru => {
+            const ogCevap = ogrenciCevaplari[soru.id] || 'BOŞ';
+            const dogru = soru.dogruCevap;
+            
+            questionsHtml += `<div class="print-question-item">`;
+            questionsHtml += `<p classclass="print-q-text"><strong>Soru ${soru.id}:</strong> ${escapeHtml(soru.metin)}</p>`;
+            questionsHtml += `<ul class="print-q-options">`;
+            soru.secenekler.forEach((sec, i) => {
+                const harf = String.fromCharCode(65 + i);
+                let style = '';
+                if (harf === dogru) style = 'font-weight:bold; color:green;';
+                if (harf === ogCevap && ogCevap !== dogru) style = 'font-weight:bold; color:red; text-decoration:line-through;';
+                
+                questionsHtml += `<li style="${style}"><strong>${harf})</strong> ${escapeHtml(sec)}</li>`;
+            });
+            questionsHtml += `</ul>`;
+            questionsHtml += `<p class="print-q-answer"><strong>Öğrenci Cevabı:</strong> ${ogCevap} | <strong>Doğru Cevap:</strong> ${dogru}</p>`;
+            questionsHtml += `</div>`;
+        });
+
+        printContent(isim, soyisim, passageTitle, passage, questionsHtml, state.sonSonuc);
+    }
+
+    function printContent(isim, soyisim, passageTitle, passage, questionsHtml, sonuc = null) {
+        const printWindow = window.open('', '_blank');
+        let sonucHtml = '';
+        if (sonuc) {
+            sonucHtml = `
+                <div class="print-summary">
+                    <h3>Sınav Sonucu</h3>
+                    <p><strong>Doğru:</strong> ${sonuc.dogruSayisi}</p>
+                    <p><strong>Yanlış:</strong> ${sonuc.yanlisSayisi}</p>
+                    <p><strong>Boş:</strong> ${sonuc.bosSayisi}</p>
+                    <p><strong>Net:</strong> ${sonuc.netSayisi.toFixed(2)}</p>
+                </div>
+            `;
         }
 
-        function initResizer() {
-            const resizer = document.getElementById('resizer');
-            const leftPanel = document.getElementById('paragraf-paneli');
-            if (!resizer || !leftPanel) return;
-            let isResizing = false;
-            const mouseMoveHandler = (e) => {
-                if (!isResizing) return;
-                const containerRect = resizer.parentElement.getBoundingClientRect();
-                let leftWidth = e.clientX - containerRect.left;
-                const minWidth = 200;
-                if (leftWidth < minWidth) leftWidth = minWidth;
-                if (containerRect.width - leftWidth < minWidth) leftWidth = containerRect.width - minWidth;
-                leftPanel.style.flexBasis = `${leftWidth}px`;
-            };
-            const mouseUpHandler = () => {
-                isResizing = false;
-                resizer.classList.remove('resizing');
-                document.body.style.cursor = 'default';
-                document.body.style.userSelect = 'auto';
-                document.removeEventListener('mousemove', mouseMoveHandler);
-                document.removeEventListener('mouseup', mouseUpHandler);
-            };
-            resizer.addEventListener('mousedown', (e) => {
-                e.preventDefault();
-                isResizing = true;
-                resizer.classList.add('resizing');
-                document.body.style.cursor = 'col-resize';
-                document.body.style.userSelect = 'none';
-                document.addEventListener('mousemove', mouseMoveHandler);
-                document.addEventListener('mouseup', mouseUpHandler);
-            });
+        const formattedPassage = escapeHtml(passage).replace(/\n\n/g, '<br><br>').replace(/\n/g, ' ');
+
+        printWindow.document.write(`
+            <html>
+            <head>
+                <title>Sınav - ${escapeHtml(passageTitle)}</title>
+                <style>
+                    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; line-height: 1.6; padding: 20px; }
+                    .print-header { border-bottom: 2px solid #333; padding-bottom: 10px; margin-bottom: 20px; }
+                    .print-header h1 { margin: 0; }
+                    .print-header p { margin: 0; font-size: 1.1em; }
+                    .print-passage h2 { margin-top: 0; }
+                    .print-passage p { font-size: 1.1em; line-height: 1.8; }
+                    .print-questions { margin-top: 30px; }
+                    .print-question-item { margin-bottom: 25px; padding-bottom: 15px; border-bottom: 1px dashed #ccc; }
+                    .print-q-text { font-size: 1.1em; margin-bottom: 10px; }
+                    .print-q-options { list-style: none; padding-left: 10px; }
+                    .print-q-options li { margin-bottom: 5px; }
+                    .print-q-answer { font-weight: bold; margin-top: 10px; }
+                    .print-summary { border: 2px solid #0d3d6e; background: #f4f7fa; padding: 15px; margin-top: 20px; border-radius: 8px; }
+                    @media print {
+                        .print-summary { background: #f4f7fa !important; -webkit-print-color-adjust: exact; }
+                        li { color: #333 !important; }
+                    }
+                </style>
+            </head>
+            <body>
+                <div class="print-header">
+                    <h1>${escapeHtml(passageTitle)}</h1>
+                    <p>Öğrenci: ${escapeHtml(isim)} ${escapeHtml(soyisim)}</p>
+                </div>
+                
+                ${sonucHtml}
+
+                <div class="print-passage">
+                    <h2>Metin</h2>
+                    <p>${formattedPassage}</p>
+                </div>
+
+                <div class="print-questions">
+                    <h2>Sorular</h2>
+                    ${questionsHtml}
+                </div>
+            </body>
+            </html>
+        `);
+
+        printWindow.document.close();
+        printWindow.focus();
+        setTimeout(() => { printWindow.print(); }, 500); // Tarayıcının içeriği yüklemesi için kısa bir bekleme
+    }
+
+    /* --- Yardımcılar (TAMAMLANDI) --- */
+    
+    /* --- Yardımcılar (TAMAMLANDI) --- */
+    
+    // Aktif onay popup'ı için callback saklayıcı
+    let onayCallback = null;
+    
+    function showOnayPopup(mesaj, callback) {
+        // DÜZELTME: onayMesaji -> ui.onayMesaji
+        ui.onayMesaji.textContent = mesaj; 
+        onayCallback = callback; // Callback'i sakla
+        ui.onayPopup.classList.add('show');
+    }
+
+    // Onay popup butonları (genel dinleyici)
+    ui.onayIptalBtn.addEventListener('click', () => {
+        ui.onayPopup.classList.remove('show');
+        onayCallback = null;
+    });
+
+    ui.onayDevamBtn.addEventListener('click', () => {
+        if (typeof onayCallback === 'function') {
+            onayCallback();
         }
-    </script>
+        ui.onayPopup.classList.remove('show');
+        onayCallback = null;
+    });
+
+
+    // Bilgi popup için callback saklayıcı
+    let bilgiCallback = null;
+
+    function showBilgiPopup(mesaj, callback = null) {
+        // DÜZELTME: bilgiMesaji -> ui.bilgiMesaji
+        ui.bilgiMesaji.textContent = mesaj; 
+        bilgiCallback = callback;
+        ui.bilgiPopup.classList.add('show');
+    }
+
+    // Bilgi popup kapatma butonu (genel dinleyici)
+    ui.bilgiKapatBtn.addEventListener('click', () => {
+        ui.bilgiPopup.classList.remove('show');
+        if (typeof bilgiCallback === 'function') {
+            bilgiCallback();
+        }
+        bilgiCallback = null;
+    });
+
+
+    function kullaniciBilgileriniYukle() {
+        if (!state.currentUser) return;
+        const adSoyad = `${state.currentUser.isim || ''} ${state.currentUser.soyisim || ''}`;
+        // NodeList olduğu için forEach ile dön
+        ui.kullaniciAdSoyad.forEach(el => el.textContent = adSoyad);
+        // İnceleme ekranı için de
+        ui.kullaniciAdSoyadInceleme.forEach(el => el.textContent = adSoyad);
+    }
+
+    function initResizer() {
+        const resizer = document.getElementById('resizer');
+        if (!resizer) return;
+        
+        const leftPanel = document.getElementById('paragraf-paneli');
+        const rightPanel = document.querySelector('.sag-panel-soru');
+        
+        if (!leftPanel || !rightPanel) return;
+
+        let isResizing = false;
+        let startX, startWidthLeft, startWidthRight;
+
+        resizer.addEventListener('mousedown', (e) => {
+            isResizing = true;
+            resizer.classList.add('resizing');
+            startX = e.clientX;
+            startWidthLeft = leftPanel.offsetWidth;
+            startWidthRight = rightPanel.offsetWidth;
+            
+            document.body.style.userSelect = 'none';
+            document.body.style.cursor = 'col-resize';
+
+            document.addEventListener('mousemove', handleMouseMove);
+            document.addEventListener('mouseup', handleMouseUp);
+        });
+
+        function handleMouseMove(e) {
+            if (!isResizing) return;
+            
+            const dx = e.clientX - startX;
+            const totalWidth = startWidthLeft + startWidthRight;
+            
+            let newLeftWidth = startWidthLeft + dx;
+            let newRightWidth = startWidthRight - dx;
+
+            // Minimum genişlik ayarı
+            if (newLeftWidth < 250) {
+                newLeftWidth = 250;
+                newRightWidth = totalWidth - 250;
+            }
+            if (newRightWidth < 300) {
+                newRightWidth = 300;
+                newLeftWidth = totalWidth - 300;
+            }
+            
+            // Flex-basis yüzdesi olarak ayarla
+            leftPanel.style.flex = `0 0 ${newLeftWidth}px`;
+            rightPanel.style.flex = `1 1 ${newRightWidth}px`;
+        }
+
+        function handleMouseUp() {
+            isResizing = false;
+            resizer.classList.remove('resizing');
+            
+            document.body.style.userSelect = '';
+            document.body.style.cursor = '';
+
+            document.removeEventListener('mousemove', handleMouseMove);
+            document.removeEventListener('mouseup', handleMouseUp);
+        }
+    }
+
+    function escapeHtml(str) {
+        // Gelen değer string değilse (undefined, null, vb.) boş bir string döndür.
+        if (typeof str !== 'string') return '';
+        
+        return str
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;');
+    }
+
+  </script>
 </body>
 </html>
