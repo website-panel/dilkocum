@@ -61,7 +61,7 @@
             border-radius: 8px; font-size: 1em; font-family: 'Poppins', sans-serif;
             background-color: #fff; -webkit-appearance: none; appearance: none;
         }
-        .form-group input:disabled { /* YENİ: Kilitli input stili */
+        .form-group input:disabled {
              background-color: #f3f4f6;
         }
         .form-group select:focus, .form-group input:focus {
@@ -99,7 +99,6 @@
             -webkit-overflow-scrolling: touch;
         }
         
-        /* YENİ: Toplu Seçim Linkleri */
         .toplu-secim-linkler {
             display: flex; gap: 15px; margin-bottom: 10px;
         }
@@ -114,17 +113,15 @@
             border-radius: 6px; margin-bottom: 5px; transition: background-color 0.1s;
         }
         #ogrenci-listesi-konteyner label:hover { background-color: #f0f0f0; }
-        /* GÜNCELLENDİ: Artık radio değil checkbox */
         #ogrenci-listesi-konteyner .ogrenci-check-grup {
              display: flex; align-items: center;
         }
-        #ogrenci-listesi-konteyner input[type="checkbox"] { /* Değişti */
+        #ogrenci-listesi-konteyner input[type="checkbox"] {
             margin-right: 12px; width: 18px; height: 18px;
-            accent-color: var(--primary-color); /* YENİ: Checkbox rengi */
+            accent-color: var(--primary-color);
         }
         #ogrenci-listesi-konteyner label.selected { background-color: var(--primary-lighter); font-weight: 500; }
         #ogrenci-listesi-konteyner label.selected .ogrenci-sil-btn:hover { color: var(--danger-dark); background-color: #fff; opacity: 1; }
-
 
         /* --- Ödev Görüntüleme --- */
         .goruntuleme-alani { display: flex; gap: 25px; }
@@ -309,7 +306,7 @@
                                      </tr>
                                  </thead>
                                  <tbody>
-                                     </tbody>
+                                 </tbody>
                              </table>
                          </div>
                          <p id="odev-listesi-bos" style="display: none; color: var(--text-light); margin-top: 15px;">Bu öğrenciye atanmış ödev bulunmuyor.</p>
@@ -333,9 +330,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
-        // GÜNCELLENDİ: 'writeBatch' toplu atama için eklendi
         import { getFirestore, collection, doc, getDocs, addDoc, serverTimestamp, Timestamp, query, orderBy, updateDoc, deleteDoc, getDoc, onSnapshot, where, writeBatch } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
-        // GÜNCELLENDİ: Cloud Functions importu eklendi
         import { getFunctions, httpsCallable } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-functions.js";
 
         
@@ -343,14 +338,11 @@
 
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
-        
-        // GÜNCELLENDİ: Cloud Functions'ı başlat
         const functions = getFunctions(app);
-        // GÜNCELLENDİ: 'deleteStudent' adlı Cloud Function'ı çağrılabilir yap
         const deleteStudentCallable = httpsCallable(functions, 'deleteStudent');
 
 
-        const readingKategorileri = ['advanced_reading', 'paragraph_test', 'cloze_test'];
+        const readingKategorileri = ['advanced_reading',];
         const dateTimeFormatter = new Intl.DateTimeFormat('tr-TR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
         const dateFormatter = new Intl.DateTimeFormat('tr-TR', { day: '2-digit', month: '2-digit', year: 'numeric' });
 
@@ -370,8 +362,6 @@
              const gorunurlukTarihiInput = document.getElementById('gorunurluk-tarihi');
              const gorunurlukSaatiInput = document.getElementById('gorunurluk-saati');
              const goruntulemeOgrenciListesi = document.getElementById('goruntuleme-ogrenci-listesi');
-             
-             // GÜNCELLENDİ: Toplu seçim butonları
              const selectAllBtn = document.getElementById('select-all-btn');
              const deselectAllBtn = document.getElementById('deselect-all-btn');
 
@@ -388,11 +378,10 @@
             ogrencileriYukleRealtime(ogrenciListesiKonteyner, assignButton, 'form');
             
             kategoriSelect.addEventListener('change', (e) => handleKategoriChange(e, soruSayisiLabel, soruSayisiInput, soruSayisiGrup));
-            kategoriSelect.dispatchEvent(new Event('change')); // Sayfa yüklenince 1 kez çalıştır
+            kategoriSelect.dispatchEvent(new Event('change'));
             
             odevForm.addEventListener('submit', (e) => handleOdevSubmit(e, ogrenciListesiKonteyner, kategoriSelect, soruSayisiInput, gorunurlukTarihiInput, gorunurlukSaatiInput, assignButton, assignLoading, formMessageDiv, odevForm));
 
-            // GÜNCELLENDİ: Toplu seçim event'leri
             selectAllBtn.addEventListener('click', (e) => {
                 e.preventDefault();
                 selectAllStudents(ogrenciListesiKonteyner, true);
@@ -405,8 +394,6 @@
 
         const silmeIkonuSVG = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash3-fill" viewBox="0 0 16 16"><path d="M11 1.5v1h3.5a.5.5 0 0 1 0 1h-.538l-.853 10.66A2 2 0 0 1 11.115 16h-6.23a2 2 0 0 1-1.994-1.84L2.038 3.5H1.5a.5.5 0 0 1 0-1H5v-1A1.5 1.5 0 0 1 6.5 0h3A1.5 1.5 0 0 1 11 1.5m-5 0v1h4v-1a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5M4.5 5.029l.5 8.5a.5.5 0 1 0 .998-.06l-.5-8.5a.5.5 0 1 0-.998.06m6.53-.528a.5.5 0 0 0-.528.47l-.5 8.5a.5.5 0 0 0 .998.058l.5-8.5a.5.5 0 0 0-.47-.528M8 4.5a.5.5 0 0 0-.5.5v8.5a.5.5 0 0 0 1 0V5a.5.5 0 0 0-.5-.5"/></svg>`;
 
-
-        // --- GÜNCELLENMİŞ FONKSİYON: Öğrencileri Yükler (CHECKBOX'lı) ---
         function ogrencileriYukleRealtime(container, buttonToToggle, type = 'form') {
             const loadingElementId = type === 'form' ? 'ogrenci-loading-form' : 'ogrenci-loading-view';
             const loadingP = document.getElementById(loadingElementId);
@@ -418,14 +405,14 @@
             if (buttonToToggle) buttonToToggle.disabled = true;
 
             const usersRef = collection(db, 'kullanicilar'); 
-            const q = query(usersRef, orderBy("isim", "asc")); // İSME GÖRE SIRALA
+            const q = query(usersRef, orderBy("isim", "asc"));
 
             if (stopListeningToStudents && type === 'view') {
                  stopListeningToStudents();
             }
 
             const unsubscribe = onSnapshot(q,
-                (snapshot) => { // Başarılı veri alımı
+                (snapshot) => {
                     let ogrenciler = [];
                     snapshot.forEach(doc => {
                         const data = doc.data();
@@ -435,7 +422,7 @@
 
                     ogrenciler.sort((a, b) => a.ad.localeCompare(b.ad, 'tr', { sensitivity: 'base' }));
 
-                    container.innerHTML = ''; // Konteyneri temizle
+                    container.innerHTML = '';
                     if (ogrenciler.length === 0) {
                         container.innerHTML = '<p class="loading-text" style="padding: 20px 10px;">Sistemde kayıtlı öğrenci bulunamadı.</p>';
                         if (buttonToToggle) buttonToToggle.disabled = true;
@@ -453,9 +440,7 @@
                             deleteButton.dataset.name = ogrenciAdi;
                             deleteButton.addEventListener('click', handleOgrenciSil);
 
-
                             if (type === 'form') {
-                                // GÜNCELLENDİ: Checkbox'lı atama listesi
                                 const checkId = `ogrenci-${ogrenciId}`;
                                 const label = document.createElement('label');
                                 label.htmlFor = checkId;
@@ -466,9 +451,9 @@
                                 checkGrup.textContent = ` ${ogrenciAdi}`;
 
                                 const checkInput = document.createElement('input');
-                                checkInput.type = 'checkbox'; // Değişti
+                                checkInput.type = 'checkbox';
                                 checkInput.id = checkId;
-                                checkInput.name = 'ogrenci-check'; // Değişti
+                                checkInput.name = 'ogrenci-check';
                                 checkInput.value = ogrenciId;
                                 checkInput.dataset.name = ogrenciAdi;
                                 checkInput.addEventListener('change', (e) => {
@@ -504,7 +489,7 @@
                         });
                         if (buttonToToggle && type === 'form') buttonToToggle.disabled = false;
                     }
-                     if (loadingP) loadingP.style.display = 'none';
+                    if (loadingP) loadingP.style.display = 'none';
 
                 },
                 (error) => {
@@ -520,29 +505,26 @@
             }
         }
         
-        // GÜNCELLENDİ: Otomatik soru sayısı ayarı
         function handleKategoriChange(e, soruSayisiLabel, soruSayisiInput, soruSayisiGrup) {
             const secilenKategori = e.target.value;
             if (readingKategorileri.includes(secilenKategori)) {
                 soruSayisiLabel.textContent = 'Metin Sayısı (Reading)';
-                soruSayisiInput.placeholder = '1';
-                soruSayisiInput.value = 1; // Otomatik 1 yap
-                soruSayisiInput.disabled = false; // Kilitle
+                soruSayisiInput.placeholder = 'Örn: 5';
+                soruSayisiInput.value = '';
+                soruSayisiInput.disabled = false;
             } else {
                 soruSayisiLabel.textContent = 'Soru Sayısı';
                 soruSayisiInput.placeholder = 'Örn: 25';
-                soruSayisiInput.value = ''; // Temizle
-                soruSayisiInput.disabled = false; // Kilidi aç
+                soruSayisiInput.value = '';
+                soruSayisiInput.disabled = false;
             }
             soruSayisiGrup.style.display = 'block';
             soruSayisiInput.required = true;
         }
 
-        // GÜNCELLENDİ: Toplu Ödev Atama (Batch Write)
         async function handleOdevSubmit(e, ogrenciListesiKonteyner, kategoriSelect, soruSayisiInput, gorunurlukTarihiInput, gorunurlukSaatiInput, assignButton, assignLoading, formMessageDiv, odevForm) {
             e.preventDefault();
             
-            // GÜNCELLENDİ: Tek radio yerine tüm checkbox'ları al
             const selectedOgrenciCheckboxes = ogrenciListesiKonteyner.querySelectorAll('input[name="ogrenci-check"]:checked');
             const odevBaslikInput = document.getElementById('odev-baslik');
             const kategori = kategoriSelect.value;
@@ -559,7 +541,7 @@
 
             const tarihValue = gorunurlukTarihiInput.value;
             const saatValue = gorunurlukSaatiInput.value;
-            let gorunurlukZamani = serverTimestamp();
+            let gorunurlukZamani = serverTimestamp(); // Varsayılan: hemen
             let durum = "atanmis";
             let isZamanlanmis = false;
 
@@ -575,35 +557,39 @@
             }
 
             const baslik = odevBaslikInput.value.trim() || `${kategoriSelect.options[kategoriSelect.selectedIndex].text} Ödevi`;
+            const isReading = readingKategorileri.includes(kategori);
 
-             assignButton.disabled = true;
-             assignButton.querySelector('.btn-text').textContent = 'Atanıyor...';
-             assignLoading.style.display = 'inline';
-             formMessageDiv.style.display = 'none';
+            assignButton.disabled = true;
+            assignButton.querySelector('.btn-text').textContent = 'Atanıyor...';
+            assignLoading.style.display = 'inline';
+            formMessageDiv.style.display = 'none';
 
-             try {
-                // GÜNCELLENDİ: Toplu yazma (Batch) başlat
+            try {
                 const batch = writeBatch(db);
-                const odevData = {
-                     baslik: baslik, kategori: kategori, soruSayisi: soruSayisi,
-                     atanmaTarihi: serverTimestamp(), gorunurlukTarihi: gorunurlukZamani, durum: durum,
-                     ...(readingKategorileri.includes(kategori) && { cozulenMetinler: [] })
-                };
-                
                 let secilenOgrenciSayisi = 0;
-                
-                selectedOgrenciCheckboxes.forEach(checkbox => {
+
+                const baseOdevData = {
+                    baslik: baslik, kategori: kategori, soruSayisi: soruSayisi,
+                    atanmaTarihi: serverTimestamp(), gorunurlukTarihi: gorunurlukZamani, durum: durum,
+                };
+
+                for (const checkbox of selectedOgrenciCheckboxes) {
                     const ogrenciId = checkbox.value;
-                    if(ogrenciId) {
-                        // Her öğrencinin 'gorevler' koleksiyonuna yeni bir doküman referansı oluştur
+                    if (ogrenciId) {
+                        
+                        let finalOdevData = { ...baseOdevData };
+
+                        if (isReading) {
+                            const oncekiCozulenler = await getOgrencininCozduguTumOkumalar(ogrenciId, kategori);
+                            finalOdevData.cozulenMetinler = oncekiCozulenler; 
+                        }
+
                         const gorevRef = doc(collection(db, "odevler", ogrenciId, "gorevler"));
-                        // Bu referansı toplu yazma listesine ekle
-                        batch.set(gorevRef, odevData);
+                        batch.set(gorevRef, finalOdevData);
                         secilenOgrenciSayisi++;
                     }
-                });
+                }
 
-                // Toplu yazma işlemini tek seferde gerçekleştir
                 await batch.commit();
 
                 const mesaj = isZamanlanmis ? `Ödev zamanlandı.` : `Ödev atandı.`;
@@ -611,7 +597,7 @@
                 
                 odevForm.reset();
                 kategoriSelect.dispatchEvent(new Event('change'));
-                selectAllStudents(ogrenciListesiKonteyner, false); // Seçimi temizle
+                selectAllStudents(ogrenciListesiKonteyner, false);
 
              } catch (error) {
                  console.error("Toplu ödev atama hatası:", error);
@@ -748,7 +734,7 @@
             try {
                 await updateDoc(odevRef, { baslik: yeniBaslik });
                 const studentName = document.querySelector(`#goruntuleme-ogrenci-listesi .ogrenci-list-item[data-uid="${studentId}"]`)?.dataset.name || '';
-                ogrenciOdevleriniYukle(studentId, studentName); // Listeyi yenile
+                ogrenciOdevleriniYukle(studentId, studentName);
                 showMessage('Ödev başlığı güncellendi.', 'success');
             } catch (error) {
                 console.error("Başlık güncellenirken hata:", error);
@@ -762,7 +748,7 @@
             try {
                 await deleteDoc(odevRef);
                 const studentName = document.querySelector(`#goruntuleme-ogrenci-listesi .ogrenci-list-item[data-uid="${studentId}"]`)?.dataset.name || '';
-                ogrenciOdevleriniYukle(studentId, studentName); // Listeyi yenile
+                ogrenciOdevleriniYukle(studentId, studentName);
                 showMessage('Ödev başarıyla silindi.', 'success');
             } catch (error) {
                 console.error("Ödev silinirken hata:", error);
@@ -770,11 +756,9 @@
             }
         }
 
-
         // ===========================================
-        // BÖLÜM 3: ÖĞRENCİ SİLME FONKSİYONLARI (GÜNCELLENDİ)
+        // BÖLÜM 3: ÖĞRENCİ SİLME FONKSİYONLARI
         // ===========================================
-
         function handleOgrenciSil(e) {
             e.stopPropagation(); 
             e.preventDefault();
@@ -790,17 +774,10 @@
             });
         }
 
-        /**
-         * GÜNCELLENDİ: Öğrenciyi Cloud Function aracılığıyla TAMAMEN siler.
-         */
         async function silOgrenci(ogrenciId, ogrenciAdi) {
             if (!ogrenciId) return;
 
-            // Not: Silme işlemi Cloud Function üzerinden yapılacağı için
-            // onSnapshot değişikliği otomatik olarak algılayacak ve listeyi yenileyecektir.
-
             try {
-                // Cloud Function'ı çağır
                 const result = await deleteStudentCallable({ studentId: ogrenciId });
                 
                 if (result.data.success) {
@@ -822,21 +799,17 @@
                 } else if (error.code === 'functions/internal' || error.message.includes('INTERNAL')) {
                      hataMesaji = "Sunucu tarafında (Cloud Function) bir hata oluştu, öğrenci silinemedi. (Fonksiyonu deploy ettiniz mi?)";
                 } else if (error.code === 'functions/not-found' || error.message.includes('NOT_FOUND')) {
-                    hataMesaji = "'deleteStudent' adlı Cloud Function bulunamadı. Lütfen deploy ettiğinizden emin olun."
+                     hataMesaji = "'deleteStudent' adlı Cloud Function bulunamadı. Lütfen deploy ettiğinizden emin olun."
                 }
                 
                 showMessage(`Öğrenci (${ogrenciAdi}) silinirken bir hata oluştu: ${hataMesaji}`, 'error');
             }
         }
 
-
         // ===========================================
         // BÖLÜM 4: YARDIMCI FONKSİYONLAR
         // ===========================================
 
-        /**
-         * YENİ: Öğrenci listesindeki tüm checkbox'ları seçer veya bırakır.
-         */
         function selectAllStudents(container, shouldSelect) {
             const checkboxes = container.querySelectorAll('input[name="ogrenci-check"]');
             checkboxes.forEach(checkbox => {
@@ -852,6 +825,28 @@
             });
         }
 
+        async function getOgrencininCozduguTumOkumalar(ogrenciId, kategori) {
+            const allSolvedIds = new Set();
+            try {
+                const odevlerRef = collection(db, "odevler", ogrenciId, "gorevler");
+                const q = query(odevlerRef, where("kategori", "==", kategori));
+                const querySnapshot = await getDocs(q);
+
+                querySnapshot.forEach(doc => {
+                    const data = doc.data();
+                    if (data.cozulenMetinler && Array.isArray(data.cozulenMetinler)) {
+                        data.cozulenMetinler.forEach(id => allSolvedIds.add(id));
+                    }
+                });
+                
+                console.log(`Öğrenci (${ogrenciId}) için ${Array.from(allSolvedIds).length} adet çözülmüş metin bulundu.`);
+                return Array.from(allSolvedIds);
+            } catch (error) {
+                console.error(`Öğrenci (${ogrenciId}) için önceki okumalar getirilirken hata:`, error);
+                return [];
+            }
+        }
+
         function showMessage(message, type = "info") { 
             const messageDiv = document.getElementById('form-message');
             if (!messageDiv) { console.warn("Mesaj alanı bulunamadı."); return; }
@@ -864,7 +859,7 @@
                     messageDiv.style.display = 'none'; 
                     messageDiv.textContent = ''; 
                 } 
-            }, 6000); // Mesaj süresini biraz uzattım
+            }, 6000);
         }
 
         function showOnayPopup(mesaj, callback) {
@@ -893,7 +888,7 @@
             document.querySelector('.odev-tablosu-wrapper').style.display = 'none';
             document.getElementById('odev-listesi-bos').style.display = 'none';
             const tableBody = document.getElementById('odev-tablosu-body')?.querySelector('tbody');
-            if(tableBody) tableBody.innerHTML = '';
+           if(tableBody) tableBody.innerHTML = '';
         }
 
     </script>
